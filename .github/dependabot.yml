@@ -1,15 +1,44 @@
+# Org default policy (hop-top/.github templates/dependabot.yml):
+#   version updates wait 14 days after a release (cooldown);
+#   security updates arrive immediately, one grouped PR per ecosystem.
+# Version updates: one PR at a time across every ecosystem. The group PR is
+# updated in place while it is open; nothing new opens beside it.
+# Reference: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
-updates:
-  - package-ecosystem: gomod
-    directory: "/"
+
+multi-ecosystem-groups:
+  dependencies:
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
     commit-message:
       prefix: "build(deps):"
 
+updates:
+  - package-ecosystem: gomod
+    directories:
+      - "/"
+    multi-ecosystem-group: dependencies
+    patterns:
+      - "*"
+    cooldown:
+      default-days: 14
+    groups:
+      go-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
   - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: weekly
-    commit-message:
-      prefix: "ci(deps):"
+    directories:
+      - "/"
+    multi-ecosystem-group: dependencies
+    patterns:
+      - "*"
+    cooldown:
+      default-days: 14
+    groups:
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
