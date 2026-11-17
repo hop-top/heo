@@ -40,6 +40,9 @@ type teamsBot struct {
 	// the next ones before anything else.
 	mints       []teamsMint
 	entraScript []teamsFailure
+	// callsAtFailedMint is, for each scripted token endpoint failure, how
+	// many Connector requests had been made when it was served.
+	callsAtFailedMint []int
 	// certs are the certificates registered for the app: a client assertion
 	// signed for one of them is accepted in place of the secret.
 	certs []*x509.Certificate
@@ -162,6 +165,7 @@ func (b *teamsBot) entra(req *http.Request) (*http.Response, error) {
 	if len(b.entraScript) > 0 {
 		f := b.entraScript[0]
 		b.entraScript = b.entraScript[1:]
+		b.callsAtFailedMint = append(b.callsAtFailedMint, len(b.calls))
 		return teamsReply(f.Status, nil), nil
 	}
 	reply := func(status int, v any) (*http.Response, error) {
@@ -492,6 +496,14 @@ func (b *teamsBot) setConnectorToken(token string) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	b.token = token
+}
+
+// connectorCallsAtFailedMints is, for each scripted token endpoint failure
+// in order, how many Connector requests had been made when it was served.
+func (b *teamsBot) connectorCallsAtFailedMints() []int {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return append([]int(nil), b.callsAtFailedMint...)
 }
 
 // failEntra makes the token endpoint answer the next requests with status.

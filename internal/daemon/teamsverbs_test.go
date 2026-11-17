@@ -310,9 +310,6 @@ func TestTeamsConnectorTokenEndpointFailureIsRetried(t *testing.T) {
 			if op.Failure.Code != model.Transient || !strings.Contains(op.Failure.SafeMessage, "token endpoint: HTTP 503") {
 				t.Fatalf("the failed attempt = %+v, want transient, naming the token endpoint's 503", op.Failure)
 			}
-			if n := s.bot.total(); n != 0 {
-				t.Fatalf("the Bot Connector was called %d times before a token was minted", n)
-			}
 		}
 		if op.State == model.ProviderAccepted || op.State == model.Failed {
 			break
@@ -321,6 +318,11 @@ func TestTeamsConnectorTokenEndpointFailureIsRetried(t *testing.T) {
 	}
 	if op.State != model.ProviderAccepted || !retried {
 		t.Fatalf("send = %s %+v (retry seen: %v), want a retry and then accepted", op.State, op.Failure, retried)
+	}
+	// Recorded by the stub as it served the failing mint, so the retry
+	// that follows cannot show up in it.
+	if at := s.bot.connectorCallsAtFailedMints(); len(at) != 1 || at[0] != 0 {
+		t.Errorf("Bot Connector calls when the token endpoint failed = %v, want [0]: nothing before a token is minted", at)
 	}
 	if got, sent := s.bot.mintCount(), len(s.bot.called("send")); got != 2 || sent != 1 {
 		t.Errorf("%d mints and %d sends, want 2 mints and the message posted once", got, sent)
