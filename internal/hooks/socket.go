@@ -10,7 +10,6 @@ import (
 	"os"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 )
 
@@ -131,12 +130,8 @@ func checkSocket(path string) error {
 	if fi.Mode()&os.ModeSocket == 0 {
 		return fmt.Errorf("%s is not a unix socket", path)
 	}
-	st, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok {
-		return fmt.Errorf("%s: cannot read its owner", path)
-	}
-	if int(st.Uid) != os.Geteuid() {
-		return fmt.Errorf("%s is owned by uid %d, not the daemon's uid %d", path, st.Uid, os.Geteuid())
+	if err := checkSocketOwner(path, fi); err != nil {
+		return err
 	}
 	if fi.Mode().Perm()&0o002 != 0 {
 		return fmt.Errorf("%s is writable by all users (mode %04o)", path, fi.Mode().Perm())
