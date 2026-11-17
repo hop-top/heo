@@ -1,0 +1,9 @@
+xrr: "1"
+adapter: http
+fingerprint: 35935c8c
+recorded_at: "2026-10-12T21:47:24Z"
+payload:
+    status: 200
+    headers:
+        Content-Type: application/json; charset=utf-8
+    body: '{"author_association":"OWNER","body":"Fixed in the next release.\n\n<!-- uma:<operation>:<attempt> -->","created_at":"2026-10-12T21:47:21Z","html_url":"https://github.com/owner/sandbox/issues/3#issuecomment-6133211007","id":6133211007,"issue_url":"https://api.github.com/repos/owner/sandbox/issues/3","minimized":null,"node_id":"NODE_ID","performed_via_github_app":null,"pin":null,"reactions":{"+1":0,"-1":0,"confused":0,"eyes":0,"heart":0,"hooray":0,"laugh":0,"rocket":0,"total_count":0,"url":"https://api.github.com/repos/owner/sandbox/issues/comments/6133211007/reactions"},"updated_at":"2026-10-12T21:47:24Z","url":"https://api.github.com/repos/owner/sandbox/issues/comments/6133211007","user":{"avatar_url":"https://avatars.invalid/u/9100001","html_url":"https://github.com/sandbox-account","id":9100001,"login":"sandbox-account","node_id":"NODE_ID","site_admin":false,"type":"User","url":"https://api.github.com/users/sandbox-account"}}'

@@ -1,0 +1,10 @@
+{
+  "profile": "heo://profile/default",
+  "valid": true,
+  "issues": [],
+  "channels": {
+    "checked": false,
+    "count": 0,
+    "skipped": "channels and inboxes live in the data store the daemon owns: no heo daemon is running: nothing listens on /tmp/heo-12fc/run/heo/default/heo.sock; start it with `heo service start`, then rerun"
+  }
+}

@@ -1,0 +1,7 @@
+xrr: "1"
+adapter: http
+fingerprint: f5783f0a
+recorded_at: "2026-10-12T21:47:26Z"
+payload:
+    method: DELETE
+    url: https://api.github.com/repos/owner/sandbox/issues/comments/6133209390/reactions/439065547

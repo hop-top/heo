@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hop-top/kit/main/contracts/story-schema.json
+schema_version: "1"
+story_id: heo.local.install-walkthrough
+title: Evaluate a fresh heo install before its daemon runs
+binary: heo
+intent: |
+  An operator has just installed heo and has not started its daemon. They
+  want to know what this build can do, what a configuration change would
+  touch, that applying the same change twice is safe, and what heo tells
+  them when a command needs a daemon that is not there. Everything in
+  this story runs without a data store, a provider or a network.
+references:
+  - title: heo commands
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/commands.md
+  - title: heo configuration
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/configuration.md
+preconditions:
+  - heo is on PATH
+  - no daemon is running for the selected profile
+  - the profile file is empty or absent
+steps:
+  - id: schema_version
+    intent: |
+      Read the capability manifest's schema version, the cheap probe a
+      caller makes before it reads the whole manifest.
+    invoke: ["heo", "spec", "--version"]
+    capture: [exit_code, stdout]
+  - id: adapters
+    intent: |
+      List the adapters this build carries, with the capabilities and the
+      heo verbs each one enables.
+    invoke: ["heo", "adapter", "list", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_before
+    intent: |
+      Read the tenant the runtime would use, and which layer it comes from.
+    invoke: ["heo", "config", "get", "runtime.tenant", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_preview
+    intent: |
+      Preview setting the tenant: the file the change would touch, with
+      nothing written.
+    invoke: ["heo", "config", "set", "runtime.tenant", "acme", "--dry-run", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_after_preview
+    intent: |
+      Read the tenant again to see that the preview changed nothing.
+    invoke: ["heo", "config", "get", "runtime.tenant", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_apply
+    intent: |
+      Apply the change: write the tenant into the profile file.
+    invoke: ["heo", "config", "set", "runtime.tenant", "acme", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_apply__replay
+    intent: |
+      Apply the same change again, as a retry after a lost answer would.
+    invoke: ["heo", "config", "set", "runtime.tenant", "acme", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: tenant_after
+    intent: |
+      Read the tenant once more to confirm where the value now comes from.
+    invoke: ["heo", "config", "get", "runtime.tenant", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: unknown_adapter
+    intent: |
+      Ask for an adapter this build does not carry, and read how heo
+      points to the way forward.
+    invoke: ["heo", "adapter", "get", "no.such", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: bad_scope
+    intent: |
+      Name a configuration scope that does not exist, the way a typo in a
+      script would.
+    invoke: ["heo", "config", "set", "runtime.tenant", "acme", "--scope", "nowhere", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: validate
+    intent: |
+      Check the configuration. Channels and inboxes live in the data store
+      the daemon owns, so the report says they were not checked.
+    invoke: ["heo", "config", "validate", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: daemon_status
+    intent: |
+      Ask the daemon for its status when none runs.
+    invoke: ["heo", "service", "status", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: inbox_without_daemon
+    intent: |
+      Read the conversation list, a command that needs the daemon.
+    invoke: ["heo", "conversation", "list", "--format", "json"]
+    capture: [exit_code, stdout, stderr]
+  - id: stop_without_daemon
+    intent: |
+      Stop a daemon that is not running, as a script that always stops
+      before it starts would.
+    invoke: ["heo", "service", "stop", "--format", "json"]
+    capture: [exit_code, stdout, stderr]

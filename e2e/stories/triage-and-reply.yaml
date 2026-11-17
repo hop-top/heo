@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hop-top/kit/main/contracts/story-schema.json
+schema_version: "1"
+story_id: heo.conversation.triage-and-reply
+title: Read the open conversations of an inbox and answer one
+binary: heo
+intent: |
+  A support agent starts the day with the daemon running and wants to see
+  what is waiting in one inbox, read the oldest conversation, preview a
+  reply, send it under a key so a retry cannot send twice, and mark the
+  conversation resolved.
+references:
+  - title: Conversations, messages and notes
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/conversations.md
+preconditions:
+  - the daemon is running for the selected profile
+  - the inbox support exists and holds an open conversation
+steps:
+  - id: list_open
+    intent: |
+      List the open conversations of the support inbox, one page of ten.
+    invoke: ["heo", "conversation", "list", "--inbox", "support", "--status", "open", "--limit", "10", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: read
+    intent: |
+      Read one conversation, noting its revision for the later change.
+    invoke: ["heo", "conversation", "get", "conv_123", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: preview_reply
+    intent: |
+      Preview the reply: the destination, the audience and the text, with
+      nothing sent.
+    invoke: ["heo", "message", "reply", "conv_123", "--text", "Thanks, we are on it.", "--dry-run", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: send_reply
+    intent: |
+      Send the reply under a key, so rerunning the same command returns
+      the same operation instead of sending again.
+    invoke: ["heo", "message", "reply", "conv_123", "--text", "Thanks, we are on it.", "--idempotency-key", "reply-42", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: resolve
+    intent: |
+      Resolve the conversation at the revision read earlier, so a change
+      made meanwhile by someone else is a conflict and not overwritten.
+    invoke: ["heo", "conversation", "resolve", "conv_123", "--revision", "rev_123", "--format", "json"]
+    capture: [exit_code, stdout]

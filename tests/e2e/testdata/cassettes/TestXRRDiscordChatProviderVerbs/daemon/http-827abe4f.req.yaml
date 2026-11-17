@@ -1,0 +1,10 @@
+xrr: "1"
+adapter: http
+fingerprint: 827abe4f
+recorded_at: "2026-10-20T08:39:49Z"
+payload:
+    method: POST
+    url: https://discord.com/api/v10/channels/900000000000000104/messages
+    headers:
+        Content-Type: application/json
+    body: '{"allowed_mentions":{"parse":[]},"content":"heo adapter test 2","enforce_nonce":true,"nonce":"<nonce>"}'

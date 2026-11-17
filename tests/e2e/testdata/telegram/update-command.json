@@ -1,0 +1,1 @@
+{"update_id":1760000503,"message":{"message_id":9000003,"from":{"id":5000000002,"is_bot":false},"chat":{"id":-1000000000001,"type":"supergroup"},"date":1760000600,"text":"/status@heo_adapter_test_bot heo adapter test","entities":[{"type":"bot_command","offset":0,"length":28}]}}

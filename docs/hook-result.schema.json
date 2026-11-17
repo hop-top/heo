@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heo.invalid/schemas/hook-result.schema.json",
+  "title": "heo hook result",
+  "description": "What a plugin writes to stdout for one envelope: an ordered list of operations in heo's command vocabulary. Exec mode: one object, then exit. Subscriber mode: one object per line, in the order the envelopes arrived. Empty stdout is {\"operations\": []}. The runner applies the operations in order as the plugin's actor, stops at the first failure, and leaves earlier ones applied.",
+  "type": "object",
+  "required": ["operations"],
+  "additionalProperties": false,
+  "properties": {
+    "heo_version": {"const": 1},
+    "event_id": {
+      "type": "string",
+      "description": "Required in subscriber mode, to pair a result with its envelope; ignored in exec mode."
+    },
+    "operations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/operation"}
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional text recorded with the delivery; never shown to a provider."
+    }
+  },
+  "$defs": {
+    "operation": {
+      "type": "object",
+      "required": ["verb"],
+      "additionalProperties": false,
+      "properties": {
+        "verb": {
+          "type": "string",
+          "pattern": "^[a-z]+( [a-z-]+)+$",
+          "description": "A heo verb as the command reference names it, e.g. \"message reply\". A verb that does not exist, runs at the terminal only, hosts itself (such as \"plugin token mint\"), is destructive, acts on the daemon's machine or cannot be replayed rejects the whole result before anything is applied. A verb the plugin's actor may not run fails the operation."
+        },
+        "args": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Positional arguments, exactly as on the command line. No shell is involved. The verb is run with these arguments and the flags below, as a request to the daemon's command surface names them."
+        },
+        "flags": {
+          "type": "object",
+          "propertyNames": {"not": {"enum": ["idempotency-key", "dry-run", "confirm"]}},
+          "additionalProperties": {"type": ["string", "number", "boolean"]},
+          "description": "Flags by long name without dashes, e.g. {\"text\": \"hello\"}. A flag the verb does not declare rejects the result. --idempotency-key is set from idempotency_key, --dry-run and --confirm are not a plugin's to set."
+        },
+        "idempotency_key": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Optional. Default: the runner derives plugin, event_id and a hash of the operation (verb, args, flags as canonical JSON), stable across redeliveries."
+        }
+      }
+    }
+  }
+}

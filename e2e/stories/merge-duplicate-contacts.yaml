@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hop-top/kit/main/contracts/story-schema.json
+schema_version: "1"
+story_id: heo.contact.merge-duplicates
+title: Merge two contacts that are the same person
+binary: heo
+intent: |
+  An operator finds the same person under two contacts. They read both,
+  preview the merge to see which identities and conversations move and at
+  which revisions, and only then merge, naming the reason. The merge has
+  no undo, so the preview comes first.
+references:
+  - title: Contacts and identities
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/contacts.md
+preconditions:
+  - the daemon is running for the selected profile
+  - two contacts of the same kind exist
+steps:
+  - id: list
+    intent: |
+      List the people the profile knows, one page.
+    invoke: ["heo", "contact", "list", "--kind", "person", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: preview
+    intent: |
+      Preview the merge: heo prints uma's own preview and the two revisions
+      to merge at, and writes nothing.
+    invoke: ["heo", "contact", "merge", "ct_1", "ct_2", "--reason", "same_person", "--dry-run", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: merge
+    intent: |
+      Merge at the revisions the preview showed. Without a terminal the
+      command refuses unless the caller confirms.
+    invoke: ["heo", "contact", "merge", "ct_1", "ct_2", "--reason", "same_person", "--revision", "rev_1", "--into-revision", "rev_2", "--confirm=yes", "--format", "json"]
+    capture: [exit_code, stdout]

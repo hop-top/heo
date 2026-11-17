@@ -1,0 +1,8 @@
+xrr: "1"
+adapter: http
+fingerprint: 7f3bb858
+recorded_at: "2026-10-20T08:39:50Z"
+payload:
+    status: 204
+    headers:
+        Content-Type: text/html; charset=utf-8

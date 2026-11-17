@@ -1,0 +1,7 @@
+{
+  "code": "NOT_FOUND",
+  "message": "no adapter \"no.such\" in this build",
+  "suggested_fix": "list the installed adapters with `heo adapter list`",
+  "exit_code": 3,
+  "transience": "permanent"
+}

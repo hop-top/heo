@@ -1,0 +1,45 @@
+version: 2
+project_name: heo
+
+builds:
+  - id: heo
+    main: .
+    binary: heo
+    env: [CGO_ENABLED=0]
+    flags: [-trimpath, -buildvcs=false]
+    # windows is build-only: the CLI reaches the daemon over a unix socket
+    # with peer-credential auth, which windows lacks, so a windows archive
+    # would ship a binary whose daemon-backed commands cannot work.
+    # `make build-windows` (run by `make check` and CI) keeps it compiling.
+    goos: [linux, darwin]
+    goarch: [amd64, arm64]
+    ldflags:
+      - >-
+        -s -w
+        -X hop.top/heo/internal/version.ver={{ .Version }}
+        -X hop.top/heo/internal/version.commit={{ .Commit }}
+        -X hop.top/heo/internal/version.date={{ .Date }}
+
+archives:
+  - id: heo
+    ids: [heo]
+    name_template: "heo_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  # release-please authors the changelog.
+  disable: true
+
+homebrew_casks:
+  - name: heo
+    repository:
+      owner: hop-top
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/hop-top/heo
+    description: "Messaging CLI and daemon for uma"
+    license: MIT
+    binaries: [heo]

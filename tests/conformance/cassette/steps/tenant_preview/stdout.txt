@@ -1,0 +1,16 @@
+{
+  "command": "heo config set",
+  "args": {
+    "key": "runtime.tenant",
+    "scope": "profile"
+  },
+  "effects": [
+    {
+      "kind": "update",
+      "target": "/tmp/heo-12fc/cfg/heo/profiles/default.yaml",
+      "reversible": true,
+      "detail": "set runtime.tenant"
+    }
+  ],
+  "generated_at": "2026-10-13T00:37:29.124672Z"
+}

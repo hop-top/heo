@@ -1,0 +1,1 @@
+{"type":"event_callback","team_id":"T0000000001","api_app_id":"A0000000001","event_id":"Ev0000000090","event_time":1760000500,"event":{"type":"message","channel":"C0000000001","channel_type":"channel","user":"U0000000002","text":"heo adapter test inbound","ts":"1760000500.000100","event_ts":"1760000500.000100"}}

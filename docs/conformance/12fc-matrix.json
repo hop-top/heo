@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "factors": [
+    {
+      "n": 1,
+      "name": "Capability Introspection",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "verify-stories clean"
+    },
+    {
+      "n": 2,
+      "name": "Intent Clarity",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "verify-stories clean"
+    },
+    {
+      "n": 3,
+      "name": "Structured I/O",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 4,
+      "name": "Corrective Error Model",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 5,
+      "name": "Explicit Contracts",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 6,
+      "name": "Previewability",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 7,
+      "name": "Idempotency",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 8,
+      "name": "State Transparency",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 9,
+      "name": "Contextual Guidance",
+      "tier": "should",
+      "status": "pass",
+      "evidence": "verify-stories clean"
+    },
+    {
+      "n": 10,
+      "name": "Delegation Safety",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "verify-no-leak clean"
+    },
+    {
+      "n": 11,
+      "name": "Exit Code Semantics",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "grade clean"
+    },
+    {
+      "n": 12,
+      "name": "Evolution Guarantees",
+      "tier": "must",
+      "status": "pass",
+      "evidence": "verify-stories clean"
+    }
+  ]
+}

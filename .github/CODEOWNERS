@@ -1,0 +1,4 @@
+# Release automation files only; everything else needs no code-owner review.
+/.github/release-please-config.json   @hop-top/release
+/.github/.release-please-manifest.json @hop-top/release
+/CHANGELOG.md                          @hop-top/release

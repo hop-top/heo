@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "specVersion": "12fc/v1",
+  "generatedAt": "2026-10-13T00:37:30Z",
+  "tool": "kit conformance",
+  "commit": "70cdd06f4c9c6c9cbc7df2a41663735025008f7d",
+  "ref": "",
+  "leaves": [
+    {
+      "name": "verify-no-leak",
+      "exitCode": 0,
+      "status": "pass",
+      "payload": {
+        "tool": "verify-no-leak",
+        "rules_version": "2026.05.12.1",
+        "scanned_files": 5,
+        "findings": []
+      }
+    },
+    {
+      "name": "verify-stories",
+      "exitCode": 0,
+      "status": "pass",
+      "payload": {
+        "tool": "verify-stories",
+        "rules_version": "2026.05.12.1",
+        "scanned_files": 5,
+        "summary": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "findings": []
+      }
+    },
+    {
+      "name": "grade",
+      "exitCode": 0,
+      "status": "pass",
+      "payload": {
+        "scenario_id": "local-install-walkthrough",
+        "schema_version": "1",
+        "verdict": "pass",
+        "scored_at": "2026-10-13T00:37:30.351972Z",
+        "grader_version": "1.0.0",
+        "rules_version": "2026.05.12.1",
+        "tier": 2,
+        "facets": [
+          {
+            "factor": 3,
+            "status": "pass"
+          },
+          {
+            "factor": 4,
+            "status": "pass"
+          },
+          {
+            "factor": 5,
+            "status": "pass"
+          },
+          {
+            "factor": 6,
+            "status": "pass"
+          },
+          {
+            "factor": 7,
+            "status": "pass"
+          },
+          {
+            "factor": 8,
+            "status": "pass"
+          },
+          {
+            "factor": 11,
+            "status": "pass"
+          }
+        ]
+      }
+    }
+  ],
+  "findings": [],
+  "summary": {
+    "pass": 3,
+    "fail": 0,
+    "skip": 0
+  }
+}

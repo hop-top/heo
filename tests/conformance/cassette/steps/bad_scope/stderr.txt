@@ -1,0 +1,7 @@
+{
+  "code": "USAGE",
+  "message": "invalid --scope \"nowhere\": want profile or user",
+  "suggested_fix": "run 'heo config set --help' for usage",
+  "exit_code": 2,
+  "transience": "permanent"
+}

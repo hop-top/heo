@@ -1,0 +1,10 @@
+xrr: "1"
+adapter: http
+fingerprint: 79b44529
+recorded_at: "2026-10-20T08:39:49Z"
+payload:
+    method: PATCH
+    url: https://discord.com/api/v10/channels/900000000000000104/messages/1562022513783865355
+    headers:
+        Content-Type: application/json
+    body: '{"allowed_mentions":{"parse":[]},"components":[],"content":"heo adapter test 1 edited"}'

@@ -1,0 +1,8 @@
+xrr: "1"
+adapter: exec
+fingerprint: 2990a70c
+recorded_at: "2026-10-12T17:16:59Z"
+error: 'pg_dump: exit status 3: pg_dump: error: the stub refuses'
+payload:
+    stdout: ""
+    exit_code: 3

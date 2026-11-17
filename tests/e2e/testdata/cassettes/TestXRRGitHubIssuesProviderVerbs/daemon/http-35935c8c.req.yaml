@@ -1,0 +1,11 @@
+xrr: "1"
+adapter: http
+fingerprint: 35935c8c
+recorded_at: "2026-10-12T21:47:24Z"
+payload:
+    method: PATCH
+    url: https://api.github.com/repos/owner/sandbox/issues/comments/6133211007
+    headers:
+        Content-Type: application/json
+    body: |
+        {"body":"Fixed in the next release.\n\n<!-- uma:<operation>:<attempt> -->"}

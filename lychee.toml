@@ -1,0 +1,6 @@
+# Addresses that answer only once the repository and its first release
+# are published; the README's badges and the install guide point at them.
+exclude = [
+  '^https://github\.com/hop-top/heo(/|$)',
+  '^https://pkg\.go\.dev/hop\.top/heo$',
+]

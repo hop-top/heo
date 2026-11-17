@@ -1,0 +1,4 @@
+# The recorded cassette's manifest names the scenario it was recorded for
+# (scenario_id: an identifier, no rubric); verify-no-leak reads that key as
+# scenario-shaped. The rest of the cassette is still scanned.
+tests/conformance/cassette/manifest.yaml

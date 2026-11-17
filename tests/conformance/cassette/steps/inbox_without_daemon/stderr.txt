@@ -1,0 +1,8 @@
+{
+  "code": "PREREQUISITE",
+  "message": "no heo daemon is running: nothing listens on /tmp/heo-12fc/run/heo/default/heo.sock",
+  "cause": "lstat /tmp/heo-12fc/run/heo/default: no such file or directory",
+  "suggested_fix": "start it with `heo service start`, then rerun",
+  "exit_code": 70,
+  "transience": "transient"
+}

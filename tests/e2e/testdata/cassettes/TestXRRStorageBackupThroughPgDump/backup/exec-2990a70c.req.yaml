@@ -1,0 +1,11 @@
+xrr: "1"
+adapter: exec
+fingerprint: 2990a70c
+recorded_at: "2026-10-12T17:16:59Z"
+payload:
+    argv:
+        - pg_dump
+        - --format=custom
+        - --no-password
+        - --table="public".uma_*
+        - --dbname=<dsn>

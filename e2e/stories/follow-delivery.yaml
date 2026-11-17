@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hop-top/kit/main/contracts/story-schema.json
+schema_version: "1"
+story_id: heo.delivery.follow-a-send
+title: Follow a send until the provider has answered
+binary: heo
+intent: |
+  An operator sent a reply under a key and the terminal closed before the
+  answer arrived. They find the operation by its key, see whether the
+  provider took the message, list the deliveries that ended without a
+  clear outcome, and ask heo to reconcile one of them.
+references:
+  - title: Deliveries and events
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/deliveries-and-events.md
+preconditions:
+  - the daemon is running for the selected profile
+  - a reply was sent under the key reply-42
+steps:
+  - id: find
+    intent: |
+      Find the operation the reply was submitted under, by its key.
+    invoke: ["heo", "operation", "get", "--key", "reply-42", "--kind", "message.reply", "--target", "conversation:conv_123", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: unclear
+    intent: |
+      List the deliveries whose outcome the provider never confirmed.
+    invoke: ["heo", "delivery", "list", "--state", "outcome_unknown", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: watch
+    intent: |
+      Follow committed events as they arrive, until interrupted.
+    invoke: ["heo", "event", "watch", "--format", "json"]
+    capture: [exit_code, stdout]

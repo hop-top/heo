@@ -1,0 +1,59 @@
+# Contributing to heo
+
+Thanks for your interest in contributing!
+
+## Getting Started
+
+1. Fork the repository
+2. Clone your fork locally
+3. Create a feature branch: `git checkout -b feat/my-change`
+4. Make your changes
+5. Run tests: `make test`
+6. Commit using
+   [Conventional Commits](https://conventionalcommits.org)
+7. Push and open a Pull Request
+
+## Development Setup
+
+```sh
+make setup
+```
+
+This downloads the Go modules and installs the link checker. The pinned
+toolchain (Go, golangci-lint) is in `mise.toml`.
+
+## Code Style
+
+- Follow existing conventions in the codebase
+- Run the gate before submitting: `make check` (lint, generated docs, tests,
+  spec coverage, links, windows build)
+- Keep changes focused; one concern per PR
+
+## Commit Messages
+
+Use [Conventional Commits](https://conventionalcommits.org):
+
+```
+feat(scope): add new feature
+fix(scope): correct a bug
+docs: update readme
+test: add missing tests
+```
+
+## Pull Requests
+
+- Reference related issues in the PR description
+- Keep PRs small and reviewable
+- Ensure CI passes before requesting review
+- Update documentation if behavior changes
+
+## Issues
+
+- Search existing issues before opening a new one
+- Use issue templates when available
+- Provide reproduction steps for bugs
+
+## Code of Conduct
+
+Be respectful and constructive. We are all here to build
+something great together.

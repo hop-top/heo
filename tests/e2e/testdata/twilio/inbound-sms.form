@@ -1,0 +1,16 @@
+# An incoming SMS as Twilio posts it to a number's message webhook: the
+# form fields its documentation lists, from the fictional recipient to the
+# fictional sender. Stored unsigned; the test signs it when it runs.
+ToCountry=US
+FromCountry=US
+SmsMessageSid=SM00000000000000000000000000000090
+SmsSid=SM00000000000000000000000000000090
+MessageSid=SM00000000000000000000000000000090
+AccountSid=AC00000000000000000000000000000001
+ApiVersion=2010-04-01
+From=%2B15550100002
+To=%2B15550100001
+Body=heo+adapter+test+inbound
+NumMedia=0
+NumSegments=1
+SmsStatus=received

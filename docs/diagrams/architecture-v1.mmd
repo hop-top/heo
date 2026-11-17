@@ -1,0 +1,23 @@
+flowchart LR
+  subgraph invoking process
+    CLI[heo CLI<br/>cmd/]
+  end
+  subgraph daemon: heo service start
+    CG[control gate<br/>authz roles]
+    DESK[desk, channels<br/>command services]
+    UMA[(uma engine<br/>operations + events)]
+    W[workers]
+    R[receivers]
+    WH[webhook listener]
+    BR[event bridge]
+  end
+  DB[(PostgreSQL<br/>+ blob dir)]
+  P[providers]
+  CLI -- control socket --> CG
+  REST[REST / gRPC / MCP<br/>bearer token] --> CG
+  CG --> DESK --> UMA
+  UMA --- DB
+  UMA --> W -- deliver --> P
+  P -- inbound --> R --> UMA
+  P -- webhook --> WH --> UMA
+  UMA -- events --> BR

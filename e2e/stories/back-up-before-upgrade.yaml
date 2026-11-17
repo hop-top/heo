@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/hop-top/kit/main/contracts/story-schema.json
+schema_version: "1"
+story_id: heo.storage.back-up-before-upgrade
+title: Back up the data store before replacing the binary
+binary: heo
+intent: |
+  An operator is about to upgrade heo. They check the store's state, take
+  a backup that includes the attachment files, and keep the path it prints
+  so a failed upgrade can be undone by restoring it.
+references:
+  - title: Runtime services
+    url: https://github.com/hop-top/heo/blob/main/docs/manual/runtime.md
+preconditions:
+  - the data store is initialized
+steps:
+  - id: state
+    intent: |
+      Read the store's driver, schema version and ownership.
+    invoke: ["heo", "storage", "status", "--format", "json"]
+    capture: [exit_code, stdout]
+  - id: backup
+    intent: |
+      Write the backup and print the file it wrote, as JSON a script can
+      keep.
+    invoke: ["heo", "storage", "backup", "--format", "json"]
+    capture: [exit_code, stdout]

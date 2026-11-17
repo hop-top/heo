@@ -1,0 +1,1 @@
+{"update_id":1760000502,"callback_query":{"id":"heo-adapter-test-callback","from":{"id":5000000002,"is_bot":false},"chat_instance":"heo-adapter-test","data":"approve","message":{"message_id":9000002,"from":{"id":7000000001,"is_bot":true,"username":"heo_adapter_test_bot"},"chat":{"id":-1000000000001,"type":"supergroup"},"date":1760000400,"text":"heo adapter test choose"}}}

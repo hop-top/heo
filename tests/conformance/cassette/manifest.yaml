@@ -1,0 +1,55 @@
+schema_version: "1"
+binary: heo
+binary_version: 70cdd06
+recorder: xrr
+recorder_version: 0.1.0-alpha.3
+recorded_at: 2026-10-13T00:37:29Z
+scenario_id: heo/local-install-walkthrough
+scenario_version: 1.0.0
+story_ref:
+  story_id: heo.local.install-walkthrough
+  story_path: story.yaml
+  content_hash: sha256:6fd9b86399ccfd1cf46c0bdefbd29b5802dc9da0a9528df9ef66542157aa510d
+steps:
+  - id: schema_version
+    cassette_dir: steps/schema_version/cassette
+    captures: steps/schema_version
+  - id: adapters
+    cassette_dir: steps/adapters/cassette
+    captures: steps/adapters
+  - id: tenant_before
+    cassette_dir: steps/tenant_before/cassette
+    captures: steps/tenant_before
+  - id: tenant_preview
+    cassette_dir: steps/tenant_preview/cassette
+    captures: steps/tenant_preview
+  - id: tenant_after_preview
+    cassette_dir: steps/tenant_after_preview/cassette
+    captures: steps/tenant_after_preview
+  - id: tenant_apply
+    cassette_dir: steps/tenant_apply/cassette
+    captures: steps/tenant_apply
+  - id: tenant_apply__replay
+    cassette_dir: steps/tenant_apply__replay/cassette
+    captures: steps/tenant_apply__replay
+  - id: tenant_after
+    cassette_dir: steps/tenant_after/cassette
+    captures: steps/tenant_after
+  - id: unknown_adapter
+    cassette_dir: steps/unknown_adapter/cassette
+    captures: steps/unknown_adapter
+  - id: bad_scope
+    cassette_dir: steps/bad_scope/cassette
+    captures: steps/bad_scope
+  - id: validate
+    cassette_dir: steps/validate/cassette
+    captures: steps/validate
+  - id: daemon_status
+    cassette_dir: steps/daemon_status/cassette
+    captures: steps/daemon_status
+  - id: inbox_without_daemon
+    cassette_dir: steps/inbox_without_daemon/cassette
+    captures: steps/inbox_without_daemon
+  - id: stop_without_daemon
+    cassette_dir: steps/stop_without_daemon/cassette
+    captures: steps/stop_without_daemon

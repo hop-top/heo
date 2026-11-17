@@ -1,0 +1,11 @@
+xrr: "1"
+adapter: http
+fingerprint: a6548146
+recorded_at: "2026-10-12T21:47:22Z"
+payload:
+    method: POST
+    url: https://api.github.com/repos/owner/sandbox/issues/3/comments
+    headers:
+        Content-Type: application/json
+    body: |
+        {"body":"On it.\n\n<!-- uma:<operation>:<attempt> -->"}

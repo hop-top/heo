@@ -1,0 +1,11 @@
+# A status callback as Twilio posts it for a message it delivered, naming
+# the first message the recording sends. Stored unsigned; the test signs
+# it when it runs.
+AccountSid=AC00000000000000000000000000000001
+ApiVersion=2010-04-01
+From=%2B15550100001
+To=%2B15550100002
+MessageSid=SM00000000000000000000000000000001
+SmsSid=SM00000000000000000000000000000001
+MessageStatus=delivered
+SmsStatus=delivered

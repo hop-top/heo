@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heo.invalid/schemas/hook-envelope.schema.json",
+  "title": "heo hook envelope",
+  "description": "One event delivered to a plugin. Exec mode: one JSON object on stdin, then EOF. Subscriber mode: one object per line (NDJSON) on stdin. References only, never content: read what changed through heo, as the plugin's own actor.",
+  "type": "object",
+  "required": ["heo_version", "plugin", "event_id", "kind", "attempt", "delivered_at", "event"],
+  "additionalProperties": false,
+  "properties": {
+    "heo_version": {
+      "const": 1,
+      "description": "Envelope major version. A plugin refuses a major it does not know (exit 2)."
+    },
+    "plugin": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,62}$",
+      "description": "Plugin name; the actor is plugin:<name>."
+    },
+    "event_id": {
+      "type": "string",
+      "description": "uma's event ID. Stable across redeliveries; the deduplication key."
+    },
+    "kind": {
+      "type": "string",
+      "description": "Event kind, e.g. message.created."
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Delivery attempt of this event to this plugin, 1 on first delivery."
+    },
+    "delivered_at": {"type": "string", "format": "date-time"},
+    "event": {
+      "type": "object",
+      "description": "The event as references only: IDs, kind, inbox, resource, conversation, message, label, operation, revision and times. Never a message body, a name, an address or any other content; the plugin reads that through heo as its own actor. The kinds a plugin may subscribe to, and the references each carries, are the catalog in manual/hooks.md.",
+      "required": ["event", "kind", "tenant", "resource", "recorded_at"],
+      "properties": {
+        "event": {"type": "string"},
+        "kind": {"type": "string"},
+        "tenant": {"type": "string"},
+        "inbox": {"type": "string"},
+        "resource": {
+          "type": "object",
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": {"type": "string"},
+            "id": {"type": "string"},
+            "inbox": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "conversation": {"type": "string"},
+        "message": {"type": "string"},
+        "operation": {"type": "string"},
+        "revision": {"type": "string"},
+        "label": {"type": "string"},
+        "occurred_at": {"type": "string", "format": "date-time"},
+        "recorded_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+xrr: "1"
+adapter: exec
+fingerprint: 2990a70c
+recorded_at: "2026-10-12T17:16:59Z"
+payload:
+    stdout: PGDMP stub archive, fixed bytes
+    exit_code: 0

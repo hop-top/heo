@@ -1,0 +1,84 @@
+name: CI (Go)
+
+on:
+  push:
+    branches: [next]
+    # The workflow file + mise.toml are in the filter so toolchain and
+    # workflow repairs verify themselves instead of waiting for the
+    # next .go push.
+    paths: ["**.go", "go.mod", "go.sum", "mise.toml", "Makefile", ".github/workflows/ci-go.yml"]
+  pull_request:
+    branches: [next]
+    paths: ["**.go", "go.mod", "go.sum", "mise.toml", "Makefile", ".github/workflows/ci-go.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # >>> kit-managed: toolchain >>>
+      - uses: jdx/mise-action@v5
+        with:
+          install: true
+          cache: true
+      - run: mise run install
+      # <<< kit-managed: toolchain <<<
+
+      - name: golangci-lint
+        run: mise exec -- golangci-lint run ./...
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # >>> kit-managed: toolchain >>>
+      - uses: jdx/mise-action@v5
+        with:
+          install: true
+          cache: true
+      - run: mise run install
+      # <<< kit-managed: toolchain <<<
+
+      - name: Run tests
+        # -race requires cgo, but mise.toml pins CGO_ENABLED=0 for
+        # static builds — and `mise exec` re-applies [env] over the
+        # job/step env, silently clobbering a step-level override. The
+        # env(1) wrapper AFTER mise exec is the only layer that wins.
+        # HEO_REQUIRE_DOCKER=1 fails the storage conformance tests when
+        # no container runtime answers, instead of skipping them.
+        run: mise exec -- env CGO_ENABLED=1 HEO_REQUIRE_DOCKER=1 go test -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-go
+          path: coverage.out
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v7
+
+      # >>> kit-managed: toolchain >>>
+      - uses: jdx/mise-action@v5
+        with:
+          install: true
+          cache: true
+      - run: mise run install
+      # <<< kit-managed: toolchain <<<
+
+      - name: Build
+        run: mise exec -- go build -o heo .
+
+      # windows is build-only (no release archives); keep it compiling.
+      - name: Cross-compile (windows)
+        run: mise exec -- make build-windows

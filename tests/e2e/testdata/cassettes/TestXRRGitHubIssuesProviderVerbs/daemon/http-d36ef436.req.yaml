@@ -1,0 +1,11 @@
+xrr: "1"
+adapter: http
+fingerprint: d36ef436
+recorded_at: "2026-10-12T21:47:30Z"
+payload:
+    method: PATCH
+    url: https://api.github.com/repos/owner/sandbox/issues/3
+    headers:
+        Content-Type: application/json
+    body: |
+        {"state":"open","state_reason":"reopened"}

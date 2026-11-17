@@ -1,0 +1,26 @@
+# Made-up credential shapes in tests that prove the scrubbers and audits reject them.
+# One fingerprint per finding (file:rule:line); a real secret elsewhere still fails.
+internal/settings/settings_test.go:github-pat:227
+internal/settings/settings_test.go:github-pat:417
+internal/xrrx/audit_test.go:github-app-token:105
+internal/xrrx/audit_test.go:github-app-token:106
+internal/xrrx/audit_test.go:github-oauth:104
+internal/xrrx/audit_test.go:github-pat:103
+internal/xrrx/audit_test.go:github-refresh-token:107
+internal/xrrx/discord_test.go:discord-client-id:556
+internal/xrrx/discord_test.go:discord-client-secret:553
+internal/xrrx/discord_test.go:generic-api-key:19
+internal/xrrx/github_test.go:github-pat:246
+internal/xrrx/slack_audit_test.go:slack-webhook-url:40
+internal/xrrx/slack_test.go:generic-api-key:18
+internal/xrrx/slack_test.go:generic-api-key:465
+internal/xrrx/teams_audit_test.go:jwt:42
+internal/xrrx/teams_test.go:jwt:19
+internal/xrrx/teams_test.go:jwt:414
+internal/xrrx/telegram_test.go:generic-api-key:494
+internal/xrrx/twilio_test.go:generic-api-key:18
+internal/xrrx/twilio_test.go:twilio-api-key:389
+tests/e2e/channels_test.go:github-pat:274
+tests/e2e/cli_test.go:github-pat:385
+tests/e2e/cli_test.go:github-pat:438
+tests/e2e/xrr_imessage_test.go:generic-api-key:703

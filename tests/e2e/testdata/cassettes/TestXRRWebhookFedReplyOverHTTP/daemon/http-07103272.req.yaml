@@ -1,0 +1,10 @@
+xrr: "1"
+adapter: http
+fingerprint: "07103272"
+recorded_at: "2026-10-12T17:14:41Z"
+payload:
+    method: POST
+    url: http://loopback.invalid/v1/messages
+    headers:
+        Content-Type: application/json
+    body: '{"to":"ada","text":"we are on it"}'

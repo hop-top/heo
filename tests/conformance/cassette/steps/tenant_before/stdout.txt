@@ -1,0 +1,6 @@
+{
+  "key": "runtime.tenant",
+  "value": "default",
+  "origin": "default",
+  "detail": "built-in"
+}

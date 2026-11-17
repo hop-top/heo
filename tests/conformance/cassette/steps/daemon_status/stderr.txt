@@ -1,0 +1,7 @@
+{
+  "code": "NOT_FOUND",
+  "message": "heo is not running in control scope default",
+  "suggested_fix": "start it with `heo service start`",
+  "exit_code": 3,
+  "transience": "permanent"
+}

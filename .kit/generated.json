@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "generated_by": "kit-init",
+  "files": [
+    {
+      "path": ".githooks/pre-pr",
+      "sha256": "9490355587aa0c022e1c8b27bffab6b7e9aefaea02283f9d5a5ac20e6ad0ad98",
+      "generatedAt": "2026-10-11T20:35:06.55061Z"
+    },
+    {
+      "path": ".githooks/pre-pr.ps1",
+      "sha256": "55d9ae9f6c1b60beef72be9886620cd266fb607eb69972ebe3bf02e5c5e51330",
+      "generatedAt": "2026-10-11T20:35:06.55061Z"
+    },
+    {
+      "path": ".github/workflows/release-please.yml",
+      "sha256": "0f437f0b43ff44427389667c8778581f05ef0688e1cf66e54e0e9f4f5e8cfc6a",
+      "generatedAt": "2026-10-11T20:35:06Z"
+    }
+  ]
+}

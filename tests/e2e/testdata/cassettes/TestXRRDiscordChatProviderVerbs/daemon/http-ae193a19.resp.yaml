@@ -1,0 +1,9 @@
+xrr: "1"
+adapter: http
+fingerprint: ae193a19
+recorded_at: "2026-10-20T08:39:48Z"
+payload:
+    status: 200
+    headers:
+        Content-Type: application/json
+    body: '{"attachments":[],"author":{"bot":true,"id":"900000000000000102","username":"heo-adapter-test-bot"},"channel_id":"900000000000000104","components":[],"content":"heo adapter test 1","edited_timestamp":null,"embeds":[],"flags":0,"id":"1562022513783865355","mention_everyone":false,"mention_roles":[],"mentions":[],"nonce":"u41c9823295364d1c5ddd0867","pinned":false,"timestamp":"2026-10-20T08:39:48.261000+00:00","tts":false,"type":0}'

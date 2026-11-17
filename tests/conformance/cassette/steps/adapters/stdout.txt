@@ -1,0 +1,334 @@
+[
+  {
+    "type": "native.webwidget",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive_http",
+      "send",
+      "stream",
+      "send_ephemeral",
+      "signal",
+      "edit",
+      "delete",
+      "react",
+      "receipt",
+      "respond",
+      "respond_follow_up"
+    ],
+    "verbs": [
+      "message edit",
+      "message delete",
+      "reaction add",
+      "reaction remove",
+      "receipt send"
+    ],
+    "configuration_schema": {
+      "name": "native.webwidget.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "native.webwidget.session"
+    ],
+    "required_permissions": [],
+    "identity_namespaces": [
+      "native.webwidget.visitor",
+      "native.webwidget.user"
+    ],
+    "events": [
+      "message.received",
+      "delivery.updated",
+      "interaction.received"
+    ]
+  },
+  {
+    "type": "smtp.mail",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive",
+      "send",
+      "start_conversation"
+    ],
+    "verbs": [],
+    "configuration_schema": {
+      "name": "smtp.mail.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "smtp.relay"
+    ],
+    "required_permissions": [
+      "smtp.relay"
+    ],
+    "identity_namespaces": [
+      "smtp.mail.address"
+    ],
+    "events": []
+  },
+  {
+    "type": "imap.mail",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive",
+      "send",
+      "reconcile",
+      "start_conversation"
+    ],
+    "verbs": [],
+    "configuration_schema": {
+      "name": "imap.mail.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "imap",
+      "smtp.submission"
+    ],
+    "required_permissions": [
+      "imap",
+      "smtp.submission"
+    ],
+    "identity_namespaces": [
+      "imap.mail.address"
+    ],
+    "events": []
+  },
+  {
+    "type": "google.mail",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive",
+      "receive_http",
+      "send",
+      "reconcile"
+    ],
+    "verbs": [],
+    "configuration_schema": {
+      "name": "google.mail.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "gmail"
+    ],
+    "required_permissions": [
+      "https://www.googleapis.com/auth/gmail.readonly",
+      "https://www.googleapis.com/auth/gmail.send"
+    ],
+    "identity_namespaces": [
+      "google.mail.address"
+    ],
+    "events": [
+      "message.received",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "microsoft.mail",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive",
+      "receive_http",
+      "send",
+      "reconcile"
+    ],
+    "verbs": [],
+    "configuration_schema": {
+      "name": "microsoft.mail.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "graph",
+      "graph.notifications"
+    ],
+    "required_permissions": [
+      "Mail.ReadWrite",
+      "Mail.Send"
+    ],
+    "identity_namespaces": [
+      "microsoft.mail.address"
+    ],
+    "events": [
+      "message.received",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "twilio.sms",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "send",
+      "reconcile",
+      "receive_http",
+      "start_conversation",
+      "history"
+    ],
+    "verbs": [
+      "history fetch"
+    ],
+    "configuration_schema": {
+      "name": "twilio.sms.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "twilio.rest",
+      "twilio.webhook"
+    ],
+    "required_permissions": [],
+    "identity_namespaces": [
+      "twilio.sms"
+    ],
+    "events": [
+      "message.received",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "twilio.whatsapp",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "send",
+      "reconcile",
+      "receive_http"
+    ],
+    "verbs": [],
+    "configuration_schema": {
+      "name": "twilio.whatsapp.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "twilio.rest",
+      "twilio.webhook"
+    ],
+    "required_permissions": [],
+    "identity_namespaces": [
+      "twilio.whatsapp"
+    ],
+    "events": [
+      "message.received",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "meta.whatsapp",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive_http",
+      "send",
+      "react"
+    ],
+    "verbs": [
+      "reaction add",
+      "reaction remove"
+    ],
+    "configuration_schema": {
+      "name": "meta.whatsapp.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "meta.graph",
+      "meta.app_secret",
+      "meta.webhook.verify_token"
+    ],
+    "required_permissions": [
+      "whatsapp_business_messaging"
+    ],
+    "identity_namespaces": [
+      "meta.whatsapp"
+    ],
+    "events": [
+      "message.received",
+      "message.updated",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "github.issues",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive_http",
+      "send",
+      "reconcile",
+      "refetch",
+      "work_item_act",
+      "edit",
+      "delete",
+      "react",
+      "history"
+    ],
+    "verbs": [
+      "message edit",
+      "message delete",
+      "reaction add",
+      "reaction remove",
+      "history fetch",
+      "issue transition"
+    ],
+    "configuration_schema": {
+      "name": "github.issues.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "github.issues.api",
+      "github.issues.webhook"
+    ],
+    "required_permissions": [
+      "issues:read",
+      "issues:write",
+      "metadata:read"
+    ],
+    "identity_namespaces": [
+      "github.issues"
+    ],
+    "events": [
+      "message.received",
+      "message.updated",
+      "work_item.updated",
+      "delivery.updated"
+    ]
+  },
+  {
+    "type": "zendesk.tickets",
+    "maturity": "experimental",
+    "contract_major": 3,
+    "capabilities": [
+      "receive",
+      "receive_http",
+      "send",
+      "reconcile",
+      "extension_execute",
+      "internal_note"
+    ],
+    "verbs": [
+      "ticket transition"
+    ],
+    "configuration_schema": {
+      "name": "zendesk.tickets.config",
+      "version": 1
+    },
+    "credential_purposes": [
+      "zendesk.tickets.api",
+      "zendesk.tickets.webhook"
+    ],
+    "required_permissions": [
+      "agent",
+      "admin:webhooks",
+      "admin:incremental_export"
+    ],
+    "identity_namespaces": [
+      "zendesk.tickets"
+    ],
+    "events": [
+      "message.received",
+      "message.updated",
+      "work_item.updated",
+      "delivery.updated"
+    ]
+  }
+]
