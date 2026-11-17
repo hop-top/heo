@@ -590,3 +590,151 @@ func TestHeldEditAndBatchApproveOnServedSurfaces(t *testing.T) {
 		}
 	})
 }
+
+// TestHeldOperationEventsByInbox: a plugin's held message edit, held
+// conversation resolve and held label create are each rejected by a
+// person. The held and decided events of the first two carry the inbox
+// of their target, the verb and the target; the label's carry none. An
+// inbox filter returns the first two kinds of event of that inbox alone,
+// the same on the CLI, REST and MCP.
+func TestHeldOperationEventsByInbox(t *testing.T) {
+	withE2EBinary(t, func() {
+		e := newEffectsSite(t, heldProfile)
+		e.stop(e.d)
+		auth := e.s.useHTTPAuth()
+		api, mcp := freeAddr(t), freeAddr(t)
+		d := e.s.start(nil, nil, []string{"socket", "receivers", "api", "mcp", "workers"}, "-c", auth.config,
+			"service", "start", "--enable", "api", "--enable", "mcp", "--addr", api, "--mcp-addr", mcp)
+		defer func() { e.s.want(result{exit: d.term()}, 0) }()
+		x := &surfaces{d: d, auth: auth, api: api, mcp: mcp}
+		person, plugin := auth.token(me()), auth.token("plugin:triage")
+		m := newMCPClient(t, "http://"+mcp+"/mcp", person)
+		conv := string(e.fxMsg.Ref.Conversation.ID)
+		msg := string(e.fxMsg.Ref.ID)
+		var cv model.Conversation
+		e.json(&cv, "conversation", "get", conv)
+		inbox := cv.Ref.Inbox.ID
+
+		type op struct{ id, kind, target string }
+		ops := map[string]*op{}
+		held := func() []map[string]any {
+			t.Helper()
+			code, out := x.rest(t, http.MethodGet, "/v1/commands/operation/held/list", person, "")
+			data, _ := out["data"].(map[string]any)
+			raw, _ := data["items"].([]any)
+			if code != http.StatusOK {
+				t.Fatalf("held list = %d %v", code, out)
+			}
+			var items []map[string]any
+			for _, it := range raw {
+				items = append(items, it.(map[string]any))
+			}
+			return items
+		}
+		// propose holds one plugin operation and returns its id and kind.
+		propose := func(route, body string) (id, kind string) {
+			t.Helper()
+			before := len(held())
+			if code, out := x.rest(t, http.MethodPost, route, plugin, body); code != http.StatusOK || !strings.Contains(asString(out), "held") {
+				t.Fatalf("plugin %s = %d %v, want a held operation", route, code, out)
+			}
+			items := held()
+			if len(items) != before+1 {
+				t.Fatalf("held after %s = %v", route, items)
+			}
+			var last map[string]any
+			for _, it := range items {
+				if ops[fmt.Sprint(it["id"])] == nil {
+					last = it
+				}
+			}
+			return fmt.Sprint(last["id"]), fmt.Sprint(last["kind"])
+		}
+		var id, kind string
+		id, kind = propose("/v1/commands/message/edit", `{"args":["`+msg+`"],"flags":{"revision":"`+string(e.message(e.fxMsg).Revision)+`","text":"edited","idempotency-key":"hx-1"}}`)
+		ops[id] = &op{id, kind, msg}
+		id, kind = propose("/v1/commands/conversation/resolve", `{"args":["`+conv+`"],"flags":{"revision":"`+string(cv.Revision)+`","idempotency-key":"hx-2"}}`)
+		ops[id] = &op{id, kind, conv}
+		id, kind = propose("/v1/commands/label/create", `{"args":["billing"],"flags":{"idempotency-key":"hx-3"}}`)
+		ops[id] = &op{id, kind, ""}
+		for id := range ops {
+			if code, out := x.rest(t, http.MethodPost, "/v1/commands/operation/held/reject", person, `{"args":["`+id+`"]}`); code != http.StatusOK {
+				t.Fatalf("reject %s = %d %v", id, code, out)
+			}
+		}
+
+		const kinds = model.EventOperationHeld + "," + model.EventOperationDecided
+		asPage := func(v any) eventPageJSON {
+			t.Helper()
+			var p eventPageJSON
+			raw, _ := json.Marshal(v)
+			if err := json.Unmarshal(raw, &p); err != nil {
+				t.Fatalf("decode event page %s: %v", raw, err)
+			}
+			return p
+		}
+		// check: the events are the held and decided of the two
+		// inbox operations, with the inbox, verb and target set.
+		check := func(surface string, evs []model.Event, wantInbox bool) {
+			t.Helper()
+			per := map[string][]string{}
+			for _, ev := range evs {
+				var pl struct {
+					Operation model.OperationRef `json:"operation"`
+					Verb      string             `json:"verb"`
+					Target    model.Ref          `json:"target"`
+				}
+				if err := json.Unmarshal(ev.Payload.Data, &pl); err != nil {
+					t.Fatalf("%s: payload of %s: %v", surface, ev.ID, err)
+				}
+				o := ops[string(ev.Resource.ID)]
+				if o == nil {
+					t.Fatalf("%s: event %s of unknown operation %v", surface, ev.ID, ev.Resource)
+				}
+				if pl.Verb != o.kind || (o.target != "" && string(pl.Target.ID) != o.target) {
+					t.Errorf("%s: %s payload verb %q target %v, want %q %q", surface, ev.Kind, pl.Verb, pl.Target, o.kind, o.target)
+				}
+				if o.target != "" && ev.Inbox != inbox {
+					t.Errorf("%s: %s of %s has inbox %q, want %q", surface, ev.Kind, o.kind, ev.Inbox, inbox)
+				}
+				if o.target == "" && ev.Inbox != "" {
+					t.Errorf("%s: %s of %s has inbox %q, want none", surface, ev.Kind, o.kind, ev.Inbox)
+				}
+				per[o.id] = append(per[o.id], ev.Kind)
+			}
+			for _, o := range ops {
+				want := 2
+				if o.target == "" && wantInbox {
+					want = 0
+				}
+				if len(per[o.id]) != want {
+					t.Errorf("%s: operation %s (%s) has events %v, want %d (held and decided)", surface, o.id, o.kind, per[o.id], want)
+				}
+			}
+		}
+
+		// CLI.
+		listEvents := func(args ...string) eventPageJSON {
+			t.Helper()
+			var p eventPageJSON
+			e.json(&p, append([]string{"event", "list"}, args...)...)
+			return p
+		}
+		cli := listEvents("--inbox", string(inbox), "--kind", kinds, "--limit", "100")
+		check("CLI --inbox", cli.Items, true)
+		check("CLI unfiltered", listEvents("--kind", kinds, "--limit", "100").Items, false)
+		if other := listEvents("--inbox", "plin", "--kind", kinds, "--limit", "100"); len(other.Items) != 0 {
+			t.Errorf("CLI --inbox plin = %v, want none", other.Items)
+		}
+		// REST.
+		code, out := x.rest(t, http.MethodGet, "/v1/commands/event/list?inbox="+url.QueryEscape(string(inbox))+"&kind="+url.QueryEscape(kinds)+"&limit=100", person, "")
+		if code != http.StatusOK {
+			t.Fatalf("REST event list = %d %v", code, out)
+		}
+		data, _ := out["data"].(map[string]any)
+		check("REST --inbox", asPage(data).Items, true)
+		// MCP: kind is a JSON array.
+		got := m.callTool(t, "event.list", map[string]any{"inbox": string(inbox), "kind": []any{model.EventOperationHeld, model.EventOperationDecided}, "limit": 100})
+		check("MCP --inbox", asPage(got).Items, true)
+	})
+}

@@ -49,14 +49,14 @@ verb, the target and the inverse verb that undoes it.
 | Part | Status | What exists, or the gap |
 | --- | --- | --- |
 | Held then approved or rejected | exists | `operation held list --state ...` lists held, queued, committed, rejected, expired and the delivery states; `operation held history` gives proposed, edited, approved, rejected and expired records with who, when, note and the preview shown (`--format jsonl`) |
-| Per inbox | partial | `--inbox` on `held list`, `held history` and `operation list`; the `operation.held` and `operation.decided` events carry an empty inbox, so `event list --inbox` never returns them |
+| Per inbox | partial | `--inbox` on `held list`, `held history` and `operation list`; `event list --inbox X --kind operation.held,operation.decided` returns the operations held for, and decided on, the conversations and messages of inbox X on CLI, REST and MCP; an operation whose target has no inbox (a label, a channel or an inbox itself) carries an empty one and is not returned by an inbox filter |
 | Since a cursor | partial | `--since` and `--until` filter by time on `held list`, `held history` and `operation list`; `held history` has no `--cursor` and returns everything it matches; `held list` and `operation list` page with `--cursor` |
 | Applied automatically under trust | missing as a record | a trusted write is never held, so it is absent from `held list` and `held history`; it appears only in `operation list` read as the plugin's own token, and as `message.updated` and `delivery.updated` events with the plugin as actor; nothing marks it as automatic or names the trust key |
 | Plugin actors' operations as a person | missing | `operation list` shows the caller's own operations only (a person sees their snoozes and channel setup, not the plugin's writes); `operation held list` and `held history` do read the plugin's held ones |
 | Verb | partial | the operation has a `kind` (`message.edit`, `conversation.transition`, `label.configure`), not the CLI verb; a held operation shows the trust key and its labels (`verb`, `class`) |
 | Target | exists | `target` on the operation (`message:<inbox>/<id>`, `conversation:<inbox>/<id>`, `label:<id>`) |
 | Inverse verb | missing | no read names it; a held preview's effects carry only `reversible` (true or false) and a detail; the undo pairs (`archive` and `unarchive`, `trash` and `untrash`, `flag` and `unflag`) exist only in the command help |
-| Stream | partial | `event list` on all surfaces, `event watch` on the socket; `operation.held` and `operation.decided` are internal-visibility events, readable by desk actors |
+| Stream | partial | `event list` on all surfaces, `event watch` on the socket; `operation.held`, `operation.decided` and `operation.expired` are internal-visibility events, readable by desk actors, each with the target's inbox, the operation's `verb` (its kind) and its `target` in the payload |
 
 ## Probe method
 

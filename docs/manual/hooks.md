@@ -156,8 +156,10 @@ kind an extension registers, is not offered to plugins.
 <!-- catalog:end -->
 
 The operation events (`operation.held`, `operation.decided`,
-`operation.expired`) name the operation and nothing else: not its
-preview, its arguments, who proposed it or who decided. A plugin
+`operation.expired`) name the operation, its verb (the operation's kind) and its target, and
+carry the target's inbox (empty when the target has none, such as a
+label or an inbox): not its preview, its arguments, who proposed it or
+who decided. A plugin
 receives one only while it holds `desk` and `observer` (the operation
 read, internal audience) and its actor may read the operation's target;
 for an operation held for a conversation it may not read, the event is

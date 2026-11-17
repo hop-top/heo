@@ -301,7 +301,12 @@ offers no `--conversation` or `--since`. `--kind interaction.received` lists
 the interactions a provider reported, next to `message.received`; the event
 names the interaction (the resource), never what it carried. `heo
 interaction get <interaction>` reads it, and `heo interaction respond`
-answers it. To read one event you have an
+answers it. `--kind operation.held,operation.decided` with `--inbox`
+lists the operations held for, and decided on, that inbox's conversations
+and messages: those events carry the target's inbox, and their payload
+names the operation's `verb` (its kind) and its `target`. An operation
+whose target has no inbox (a label, a channel, an inbox) has an empty
+inbox and no inbox filter returns it. To read one event you have an
 ID for, use `event get` (below).
 
 ### Page until complete
