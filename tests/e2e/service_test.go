@@ -149,14 +149,47 @@ func (d *daemon) wait() int {
 // has no data store: they open one at start. runtime_test.go runs them.
 const noRuntime = "--disable=workers,receivers,bridge"
 
+// handedOut holds every address freeAddr returned in this process. A
+// port picked by listening and closing is free again at once, so two
+// picks in a row, such as a daemon's api and rpc addresses, can return
+// the same port; the daemon then fails to bind the second. The test
+// binary runs every test, so the set spans them all.
+var (
+	handedOutMu sync.Mutex
+	handedOut   = map[string]bool{}
+)
+
+// freeAddr returns a loopback address nothing listens on and no earlier
+// call returned.
 func freeAddr(t *testing.T) string {
 	t.Helper()
-	l, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
+	return pickAddr(t, func() (string, error) {
+		l, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			return "", err
+		}
+		defer func() { _ = l.Close() }()
+		return l.Addr().String(), nil
+	})
+}
+
+// pickAddr draws from next until it yields an address not handed out.
+func pickAddr(t *testing.T, next func() (string, error)) string {
+	t.Helper()
+	handedOutMu.Lock()
+	defer handedOutMu.Unlock()
+	for range 1000 {
+		addr, err := next()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !handedOut[addr] {
+			handedOut[addr] = true
+			return addr
+		}
 	}
-	defer func() { _ = l.Close() }()
-	return l.Addr().String()
+	t.Fatal("no unused free address after 1000 draws")
+	return ""
 }
 
 func TestServiceStartSocketOnlyAndSIGTERM(t *testing.T) {

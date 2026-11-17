@@ -120,6 +120,12 @@ func (rc *receivers) Start(ctx context.Context, ready func()) error {
 			return rc.lost(r)
 		}
 	}
+	// A receiver that returns on the cancellation settles too, so the
+	// loop above can take a settle over the canceled context when both
+	// are ready: a canceled start is not ready.
+	if ctx.Err() != nil {
+		return nil
+	}
 	rc.ready.Store(true)
 	rc.s.set(StateReady, nil)
 	r.logInfo("runtime: receivers running", "channels", n)
