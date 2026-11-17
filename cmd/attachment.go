@@ -158,7 +158,7 @@ Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[desk.Attachment]{}, Version: "1.0"})
+	setOutputSchema(c, &page[desk.Attachment]{}, "1.0")
 	return c
 }
 
@@ -195,7 +195,7 @@ exits 3. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &desk.Attachment{}, Version: "1.0"})
+	setOutputSchema(c, &desk.Attachment{}, "1.0")
 	return c
 }
 
@@ -264,7 +264,7 @@ Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &attachmentContent{}, Version: "1.0"})
+	setOutputSchema(c, &attachmentContent{}, "1.0")
 	return c
 }
 

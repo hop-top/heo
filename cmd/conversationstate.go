@@ -300,6 +300,6 @@ guide lists (` + "`operation held`" + `). Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &conversationStateOut{}, Version: "1.0"})
+	setOutputSchema(c, &conversationStateOut{}, "1.0")
 	return c
 }

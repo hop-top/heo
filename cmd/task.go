@@ -168,7 +168,7 @@ for one when it sends. Reading roles: desk, viewer.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Task]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Task]{}, "1.0")
 	return c
 }
 
@@ -208,7 +208,7 @@ not read, exits 3. Reading roles: desk, viewer.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Task{}, Version: "1.0"})
+	setOutputSchema(c, &model.Task{}, "1.0")
 	return c
 }
 
@@ -337,7 +337,7 @@ without one, heo mints a key and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &cancelOut{}, Version: "1.0"})
+	setOutputSchema(c, &cancelOut{}, "1.0")
 	return c
 }
 

@@ -158,7 +158,7 @@ writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &workflowOut{}, Version: "1.0"})
+	setOutputSchema(c, &workflowOut{}, "1.0")
 	return c
 }
 
@@ -297,7 +297,7 @@ writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &workflowOut{}, Version: "1.0"})
+	setOutputSchema(c, &workflowOut{}, "1.0")
 	return c
 }
 
@@ -395,7 +395,7 @@ nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &workflowOut{}, Version: "1.0"})
+	setOutputSchema(c, &workflowOut{}, "1.0")
 	return c
 }
 
@@ -537,7 +537,7 @@ new one. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &readMarkOut{}, Version: "1.0"})
+	setOutputSchema(c, &readMarkOut{}, "1.0")
 	return c
 }
 

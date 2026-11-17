@@ -150,7 +150,7 @@ Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[desk.HeldOperation]{}, Version: "1.0"})
+	setOutputSchema(c, &page[desk.HeldOperation]{}, "1.0")
 	return c
 }
 
@@ -220,7 +220,7 @@ Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &desk.HeldOperation{}, Version: "1.0"})
+	setOutputSchema(c, &desk.HeldOperation{}, "1.0")
 	return c
 }
 
@@ -410,7 +410,7 @@ A plugin actor may not decide: it is refused, exit 5.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &heldDecideOut{}, Version: "1.0"})
+	setOutputSchema(c, &heldDecideOut{}, "1.0")
 	return c
 }
 

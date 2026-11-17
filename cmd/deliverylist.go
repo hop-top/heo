@@ -142,6 +142,6 @@ Desk and operator roles.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[deliveryRow]{}, Version: "1.0"})
+	setOutputSchema(c, &page[deliveryRow]{}, "1.0")
 	return c
 }

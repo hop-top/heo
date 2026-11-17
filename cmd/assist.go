@@ -323,7 +323,7 @@ how many messages went in.
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &summaryOut{}, Version: "1.0"})
+	setOutputSchema(c, &summaryOut{}, "1.0")
 	return c
 }
 
@@ -393,7 +393,7 @@ it is asked once more, and a second failure is an error, never a guess.
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &triageOut{}, Version: "1.0"})
+	setOutputSchema(c, &triageOut{}, "1.0")
 	return c
 }
 
@@ -469,7 +469,7 @@ stderr), so it fits ` + "`--text \"$(heo message draft <conversation> --format t
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &draftOut{}, Version: "1.0"})
+	setOutputSchema(c, &draftOut{}, "1.0")
 	return c
 }
 

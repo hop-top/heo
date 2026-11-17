@@ -209,7 +209,7 @@ you may not read, exits 3. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &deliveryOut{}, Version: "1.0"})
+	setOutputSchema(c, &deliveryOut{}, "1.0")
 	return c
 }
 
@@ -320,6 +320,6 @@ mints a key and prints it. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &retryOut{}, Version: "1.0"})
+	setOutputSchema(c, &retryOut{}, "1.0")
 	return c
 }

@@ -91,7 +91,7 @@ size and content, the bytes base64.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &desk.RawMessage{}, Version: "1.0"})
+	setOutputSchema(c, &desk.RawMessage{}, "1.0")
 	return c
 }
 

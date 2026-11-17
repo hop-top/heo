@@ -227,7 +227,7 @@ func (a *app) modalFlags(c *cobra.Command) {
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &modalOut{}, Version: "1.0"})
+	setOutputSchema(c, &modalOut{}, "1.0")
 }
 
 // interactionModalCmd is `interaction open-modal` and `interaction

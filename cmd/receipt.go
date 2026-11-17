@@ -154,6 +154,6 @@ is a conflict; without a key, heo mints one and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &receiptOut{}, Version: "1.0"})
+	setOutputSchema(c, &receiptOut{}, "1.0")
 	return c
 }

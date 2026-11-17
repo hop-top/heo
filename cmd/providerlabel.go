@@ -122,7 +122,7 @@ and uma keeps nothing.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[providerLabelRow]{}, Version: "1.0"})
+	setOutputSchema(c, &page[providerLabelRow]{}, "1.0")
 	return c
 }
 
@@ -243,6 +243,6 @@ Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &providerLabelCreateOut{}, Version: "1.0"})
+	setOutputSchema(c, &providerLabelCreateOut{}, "1.0")
 	return c
 }

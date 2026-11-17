@@ -461,6 +461,6 @@ the machine whose browser the user signs in with.`,
 	cli.SetIdempotency(c, cli.IdempotencyNo)
 	// Interactive: a person's browser, a local listener. Never served.
 	c.Annotations[cmdmeta.KeySelfHosting] = "true"
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &authorizeOut{}, Version: "1.0"})
+	setOutputSchema(c, &authorizeOut{}, "1.0")
 	return c
 }

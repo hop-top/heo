@@ -255,7 +255,7 @@ provider message ID.`,
 	cli.SetWithholdFrom(c, cmdsurface.SurfaceREST, cmdsurface.SurfaceSSE, cmdsurface.SurfaceRPC, cmdsurface.SurfaceMCP)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &historyOut{}, Version: "1.0"})
+	setOutputSchema(c, &historyOut{}, "1.0")
 	return c
 }
 

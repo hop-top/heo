@@ -87,7 +87,7 @@ func (a *app) daemonPingCmd() *cobra.Command {
 	cli.SetWithholdFrom(c, cmdsurface.SurfaceREST, cmdsurface.SurfaceSSE, cmdsurface.SurfaceRPC, cmdsurface.SurfaceMCP)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &pingResult{}, Version: "1.0"})
+	setOutputSchema(c, &pingResult{}, "1.0")
 	_ = cli.SetExamples(c, []cli.Example{
 		{Title: "Check the daemon answers", Command: "heo daemon ping"},
 		{Title: "JSON for agents", Command: "heo daemon ping --format json"},

@@ -216,7 +216,7 @@ Marking a conversation unread moves the marker, so it counts as a change.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[desk.ConversationItem]{}, Version: "1.0"})
+	setOutputSchema(c, &page[desk.ConversationItem]{}, "1.0")
 	return c
 }
 
@@ -334,7 +334,7 @@ otherwise.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &conversationView{}, Version: "1.0"})
+	setOutputSchema(c, &conversationView{}, "1.0")
 	return c
 }
 
@@ -454,6 +454,6 @@ same operation (replayed); without one, heo mints a key and prints it.
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &conversationOut{}, Version: "1.0"})
+	setOutputSchema(c, &conversationOut{}, "1.0")
 	return c
 }

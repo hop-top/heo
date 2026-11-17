@@ -80,7 +80,7 @@ The plugin holds no role until authorization.grants names plugin:<name>.`,
 	cli.SetIdempotency(c, cli.IdempotencyNo)
 	// Never invocable on a served surface: a plugin must not mint tokens.
 	c.Annotations[cmdmeta.KeySelfHosting] = "true"
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &pluginTokenResult{}, Version: "1.0"})
+	setOutputSchema(c, &pluginTokenResult{}, "1.0")
 	_ = cli.SetExamples(c, []cli.Example{
 		{Title: "Mint a token for the triage plugin", Command: "heo plugin token mint triage"},
 	})
@@ -114,7 +114,7 @@ restart is needed. Revoking a plugin with no token succeeds.`,
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
 	c.Annotations[cmdmeta.KeySelfHosting] = "true"
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &pluginTokenResult{}, Version: "1.0"})
+	setOutputSchema(c, &pluginTokenResult{}, "1.0")
 	_ = cli.SetExamples(c, []cli.Example{
 		{Title: "Revoke the triage plugin's token", Command: "heo plugin token revoke triage"},
 	})

@@ -69,7 +69,7 @@ the previous page's next). --inbox (key or ID) and --conversation
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Message]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Message]{}, "1.0")
 	return c
 }
 
@@ -91,7 +91,7 @@ shows it. Desk role. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Message{}, Version: "1.0"})
+	setOutputSchema(c, &model.Message{}, "1.0")
 	return c
 }
 
@@ -216,6 +216,6 @@ a key and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &noteOut{}, Version: "1.0"})
+	setOutputSchema(c, &noteOut{}, "1.0")
 	return c
 }

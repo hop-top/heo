@@ -145,7 +145,7 @@ Offline: no daemon, data store or network.`,
 	}
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &[]adapterView{}, Version: "1.0"})
+	setOutputSchema(c, &[]adapterView{}, "1.0")
 	return c
 }
 
@@ -194,7 +194,7 @@ data store or network.`,
 	}
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &adapterView{}, Version: "1.0"})
+	setOutputSchema(c, &adapterView{}, "1.0")
 	return c
 }
 

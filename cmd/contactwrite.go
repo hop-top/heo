@@ -162,7 +162,7 @@ role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &contactChangeOut{}, Version: "1.0"})
+	setOutputSchema(c, &contactChangeOut{}, "1.0")
 	return c
 }
 
@@ -257,7 +257,7 @@ is. --dry-run prints the change and writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &contactChangeOut{}, Version: "1.0"})
+	setOutputSchema(c, &contactChangeOut{}, "1.0")
 	return c
 }
 
@@ -426,6 +426,6 @@ Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectDestructiveShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &contactMergeOut{}, Version: "1.0"})
+	setOutputSchema(c, &contactMergeOut{}, "1.0")
 	return c
 }

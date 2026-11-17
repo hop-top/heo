@@ -121,7 +121,7 @@ func (a *app) extraCommands() []*cobra.Command {
 	daemonCommand(destroy)
 	cli.SetSideEffect(destroy, cli.SideEffectDestructive)
 	cli.SetIdempotency(destroy, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(destroy, cli.OutputSchema{Type: &e2eDestroyResult{}, Version: "1.0"})
+	setOutputSchema(destroy, &e2eDestroyResult{}, "1.0")
 	whoami := &cobra.Command{
 		Use:   "whoami",
 		Short: "A daemon-backed read naming the caller the daemon served",
@@ -141,7 +141,7 @@ func (a *app) extraCommands() []*cobra.Command {
 	daemonCommand(whoami)
 	cli.SetSideEffect(whoami, cli.SideEffectRead)
 	cli.SetIdempotency(whoami, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(whoami, cli.OutputSchema{Type: &e2eWhoamiResult{}, Version: "1.0"})
+	setOutputSchema(whoami, &e2eWhoamiResult{}, "1.0")
 	grp.AddCommand(destroy, whoami)
 	return []*cobra.Command{grp}
 }

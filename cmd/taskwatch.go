@@ -155,7 +155,7 @@ held open would hold the daemon.`,
 	cli.SetWithholdFrom(c, cmdsurface.SurfaceREST, cmdsurface.SurfaceSSE, cmdsurface.SurfaceRPC, cmdsurface.SurfaceMCP)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Event{}, Version: "1.0"})
+	setOutputSchema(c, &model.Event{}, "1.0")
 	return c
 }
 

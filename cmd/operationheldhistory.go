@@ -172,6 +172,6 @@ yaml write the list. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &[]desk.HeldAuditRecord{}, Version: "1.0"})
+	setOutputSchema(c, &[]desk.HeldAuditRecord{}, "1.0")
 	return c
 }

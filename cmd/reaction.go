@@ -143,7 +143,7 @@ count-only row is the provider's total for an emoji, with no names.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &reactionListOut{}, Version: "1.0"})
+	setOutputSchema(c, &reactionListOut{}, "1.0")
 	return c
 }
 
@@ -241,6 +241,6 @@ mints a key and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &reactOut{}, Version: "1.0"})
+	setOutputSchema(c, &reactOut{}, "1.0")
 	return c
 }

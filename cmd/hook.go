@@ -155,7 +155,7 @@ Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &[]hookRow{}, Version: "1.0"})
+	setOutputSchema(c, &[]hookRow{}, "1.0")
 	return c
 }
 
@@ -264,7 +264,7 @@ acts on its own, outside heo, acts here too. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &hooks.TestReport{}, Version: "1.0"})
+	setOutputSchema(c, &hooks.TestReport{}, "1.0")
 	return c
 }
 
@@ -391,7 +391,7 @@ Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &[]hooks.DeadRecord{}, Version: "1.0"})
+	setOutputSchema(c, &[]hooks.DeadRecord{}, "1.0")
 	return c
 }
 
@@ -494,7 +494,7 @@ does. --dry-run shows what would change. Operator role.`,
 	// is not offered again: not for a plugin, and not served by default.
 	cli.SetSideEffect(c, cli.SideEffectDestructiveLocal)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &deadOut{}, Version: "1.0"})
+	setOutputSchema(c, &deadOut{}, "1.0")
 	return c
 }
 
@@ -612,7 +612,7 @@ Only a dead letter is retried: a replayed or discarded one is refused
 	// daemon's machine, under keys that make a repeat a no-op.
 	cli.SetSideEffect(c, cli.SideEffectWriteLocal)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &hooks.Job{}, Version: "1.0"})
+	setOutputSchema(c, &hooks.Job{}, "1.0")
 	return c
 }
 
@@ -701,7 +701,7 @@ runs nothing and queues nothing. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteLocal)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &hooks.Job{}, Version: "1.0"})
+	setOutputSchema(c, &hooks.Job{}, "1.0")
 	return c
 }
 
@@ -769,7 +769,7 @@ Operator role.`,
 	daemonCommand(get)
 	cli.SetSideEffect(get, cli.SideEffectRead)
 	cli.SetIdempotency(get, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(get, cli.OutputSchema{Type: &hooks.Job{}, Version: "1.0"})
+	setOutputSchema(get, &hooks.Job{}, "1.0")
 	grp.AddCommand(get)
 	return grp
 }

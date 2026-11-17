@@ -97,7 +97,7 @@ viewer.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Message]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Message]{}, "1.0")
 	return c
 }
 
@@ -179,7 +179,7 @@ such message, or one you may not read, exits 3. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Message{}, Version: "1.0"})
+	setOutputSchema(c, &model.Message{}, "1.0")
 	return c
 }
 
@@ -339,6 +339,6 @@ prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &replyOut{}, Version: "1.0"})
+	setOutputSchema(c, &replyOut{}, "1.0")
 	return c
 }

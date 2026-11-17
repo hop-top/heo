@@ -130,7 +130,7 @@ func (a *app) serviceSetupCmd() *cobra.Command {
 	// Never invocable on a served surface: it configures them.
 	c.Annotations[cmdmeta.KeySelfHosting] = "true"
 	allowMissingProfile(c)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &setupResult{}, Version: "1.0"})
+	setOutputSchema(c, &setupResult{}, "1.0")
 	_ = cli.SetExamples(c, []cli.Example{
 		{Title: "Enable REST and MCP on loopback", Command: "heo service setup api mcp"},
 		{Title: "Pick the address", Command: "heo service setup rpc --addr rpc=127.0.0.1:9082"},

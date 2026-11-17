@@ -209,6 +209,6 @@ without one, heo mints a key and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &replyDraftOut{}, Version: "1.0"})
+	setOutputSchema(c, &replyDraftOut{}, "1.0")
 	return c
 }

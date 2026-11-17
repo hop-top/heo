@@ -142,7 +142,7 @@ description and color. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Label]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Label]{}, "1.0")
 	return c
 }
 
@@ -226,7 +226,7 @@ writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &labelOut{}, Version: "1.0"})
+	setOutputSchema(c, &labelOut{}, "1.0")
 	return c
 }
 
@@ -374,7 +374,7 @@ and writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &conversationLabelsOut{}, Version: "1.0"})
+	setOutputSchema(c, &conversationLabelsOut{}, "1.0")
 	return c
 }
 

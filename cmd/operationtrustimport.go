@@ -202,7 +202,7 @@ holds it.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &desk.TrustImportResult{}, Version: "1.0"})
+	setOutputSchema(c, &desk.TrustImportResult{}, "1.0")
 	return c
 }
 

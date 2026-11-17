@@ -70,6 +70,6 @@ the event is there. Reading roles: desk, viewer, external.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Event{}, Version: "1.0"})
+	setOutputSchema(c, &model.Event{}, "1.0")
 	return c
 }

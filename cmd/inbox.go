@@ -123,7 +123,7 @@ destinations and state. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Inbox]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Inbox]{}, "1.0")
 	return c
 }
 
@@ -158,7 +158,7 @@ takes). Read-only. No such inbox, or one you may not read, exits 3.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Inbox{}, Version: "1.0"})
+	setOutputSchema(c, &model.Inbox{}, "1.0")
 	return c
 }
 
@@ -331,7 +331,7 @@ writes nothing. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &inboxOut{}, Version: "1.0"})
+	setOutputSchema(c, &inboxOut{}, "1.0")
 	return c
 }
 
@@ -365,7 +365,7 @@ role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &inboxOut{}, Version: "1.0"})
+	setOutputSchema(c, &inboxOut{}, "1.0")
 	return c
 }
 
@@ -404,6 +404,6 @@ nothing. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &inboxOut{}, Version: "1.0"})
+	setOutputSchema(c, &inboxOut{}, "1.0")
 	return c
 }

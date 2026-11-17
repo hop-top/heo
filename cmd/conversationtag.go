@@ -205,7 +205,7 @@ prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &conversationTagOut{}, Version: "1.0"})
+	setOutputSchema(c, &conversationTagOut{}, "1.0")
 	return c
 }
 

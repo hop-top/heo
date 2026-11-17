@@ -208,7 +208,7 @@ desk, viewer.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Interaction]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Interaction]{}, "1.0")
 	return c
 }
 
@@ -251,7 +251,7 @@ Reading roles: desk, viewer.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &model.Interaction{}, Version: "1.0"})
+	setOutputSchema(c, &model.Interaction{}, "1.0")
 	return c
 }
 
@@ -443,6 +443,6 @@ key and prints it. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &respondOut{}, Version: "1.0"})
+	setOutputSchema(c, &respondOut{}, "1.0")
 	return c
 }

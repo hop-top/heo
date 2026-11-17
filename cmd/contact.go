@@ -107,7 +107,7 @@ after a link stays listed until retention removes it. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Contact]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Contact]{}, "1.0")
 	return c
 }
 
@@ -157,6 +157,6 @@ contact, or one you may not read, exits 3.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &contactView{}, Version: "1.0"})
+	setOutputSchema(c, &contactView{}, "1.0")
 	return c
 }

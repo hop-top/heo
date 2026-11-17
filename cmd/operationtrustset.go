@@ -139,6 +139,6 @@ operator role. --dry-run reports the change and writes nothing.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &desk.TrustSetResult{}, Version: "1.0"})
+	setOutputSchema(c, &desk.TrustSetResult{}, "1.0")
 	return c
 }

@@ -130,6 +130,6 @@ by the daemon) and, for a held key, why. --label name=value keeps the keys with 
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[desk.TrustRow]{}, Version: "1.0"})
+	setOutputSchema(c, &page[desk.TrustRow]{}, "1.0")
 	return c
 }

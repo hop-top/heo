@@ -164,7 +164,7 @@ ID) and --inbox (key or ID) narrow it. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Identity]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Identity]{}, "1.0")
 	return c
 }
 
@@ -220,7 +220,7 @@ exits 3.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &identityView{}, Version: "1.0"})
+	setOutputSchema(c, &identityView{}, "1.0")
 	return c
 }
 
@@ -339,7 +339,7 @@ and writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &identityChangeOut{}, Version: "1.0"})
+	setOutputSchema(c, &identityChangeOut{}, "1.0")
 	return c
 }
 
@@ -428,6 +428,6 @@ and writes nothing. Desk role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &identityChangeOut{}, Version: "1.0"})
+	setOutputSchema(c, &identityChangeOut{}, "1.0")
 	return c
 }

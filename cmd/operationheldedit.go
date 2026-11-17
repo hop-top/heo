@@ -223,6 +223,6 @@ A plugin actor may not decide: it is refused, exit 5.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &heldDecideOut{}, Version: "1.0"})
+	setOutputSchema(c, &heldDecideOut{}, "1.0")
 	return c
 }

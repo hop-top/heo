@@ -270,7 +270,7 @@ a write uma refused before accepting it is not here. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[operationRow]{}, Version: "1.0"})
+	setOutputSchema(c, &page[operationRow]{}, "1.0")
 	return c
 }
 
@@ -346,7 +346,7 @@ An operation you may not read exits 3. Read-only.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &operationOut{}, Version: "1.0"})
+	setOutputSchema(c, &operationOut{}, "1.0")
 	return c
 }
 
@@ -484,7 +484,7 @@ held open would hold the daemon. Reading roles: desk and operator.`,
 	cli.SetWithholdFrom(c, cmdsurface.SurfaceREST, cmdsurface.SurfaceSSE, cmdsurface.SurfaceRPC, cmdsurface.SurfaceMCP)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &operationOut{}, Version: "1.0"})
+	setOutputSchema(c, &operationOut{}, "1.0")
 	return c
 }
 

@@ -300,7 +300,7 @@ the provider owns is held; one of a status uma owns cannot be held yet.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &workItemStatusOut{}, Version: "1.0"})
+	setOutputSchema(c, &workItemStatusOut{}, "1.0")
 	return c
 }
 
@@ -512,6 +512,6 @@ one of fields uma owns cannot be held yet.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &updateOut{}, Version: "1.0"})
+	setOutputSchema(c, &updateOut{}, "1.0")
 	return c
 }

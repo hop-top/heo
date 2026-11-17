@@ -305,6 +305,6 @@ call, so the viewer and external roles may not.`,
 	// none), and repeating it is safe.
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &reconcileOut{}, Version: "1.0"})
+	setOutputSchema(c, &reconcileOut{}, "1.0")
 	return c
 }

@@ -128,7 +128,7 @@ the previous page's next). Read-only; the operator role reads channels.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &page[model.Channel]{}, Version: "1.0"})
+	setOutputSchema(c, &page[model.Channel]{}, "1.0")
 	return c
 }
 
@@ -211,7 +211,7 @@ exits 3.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &channelView{}, Version: "1.0"})
+	setOutputSchema(c, &channelView{}, "1.0")
 	return c
 }
 
@@ -377,7 +377,7 @@ restart. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &channelOut{}, Version: "1.0"})
+	setOutputSchema(c, &channelOut{}, "1.0")
 	return c
 }
 
@@ -410,7 +410,7 @@ webhook route; requests open on the old route end. Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWrite)
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &channelOut{}, Version: "1.0"})
+	setOutputSchema(c, &channelOut{}, "1.0")
 	return c
 }
 
@@ -509,7 +509,7 @@ Operator role.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &channelChecks{}, Version: "1.0"})
+	setOutputSchema(c, &channelChecks{}, "1.0")
 	return c
 }
 

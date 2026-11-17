@@ -111,7 +111,7 @@ ingress, and from the changes the provider applied.`,
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
 	cli.SetIdempotency(c, cli.IdempotencyYes)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &participantListOut{}, Version: "1.0"})
+	setOutputSchema(c, &participantListOut{}, "1.0")
 	return c
 }
 
@@ -266,6 +266,6 @@ a key and prints it. Desk role.`,
 		cli.SetSideEffect(c, cli.SideEffectWriteShared)
 	}
 	cli.SetIdempotency(c, cli.IdempotencyConditional)
-	_ = cli.SetOutputSchema(c, cli.OutputSchema{Type: &participantChangeOut{}, Version: "1.0"})
+	setOutputSchema(c, &participantChangeOut{}, "1.0")
 	return c
 }
