@@ -143,6 +143,11 @@ type Filter struct {
 	Text         string
 	Since        *time.Time
 	Until        *time.Time
+	// Sort orders a conversation listing: SortLastActivity or empty for
+	// uma's own order. UpdatedSince keeps the conversations whose last
+	// activity is after it. Only ListConversationItems honours either.
+	Sort         string
+	UpdatedSince *time.Time
 }
 
 // FindInbox returns the inbox whose key or ID is ref.

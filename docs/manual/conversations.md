@@ -42,10 +42,23 @@ examples below).
 heo conversation list                         # every inbox you may read
 heo conversation list --inbox web --status open,pending
 heo conversation list --work-item --work-item-status open   # issues and tickets, by the work item's status
+heo conversation list --sort last-activity --updated-since 2026-10-01T09:00:00Z   # newest change first, only those changed after
 heo conversation get conv_123                 # status, reply route, revision
 heo message list --conversation conv_123      # its messages, oldest first
 heo message get msg_123
 ```
+
+Each listed conversation shows its last activity (`last_activity`): the
+newest of its newest message you may read (imported history does not
+count), the time its snooze was set and the time you last moved your own
+read marker. `--sort last-activity` lists the newest change first, so a
+conversation moves to the top when a message arrives, a read marker moves
+(marking unread included) or a snooze starts. `--updated-since` keeps the
+conversations whose last activity is after a time, for a client that
+refreshes incrementally. uma keeps no activity time, so heo derives it by
+reading each conversation the other filters keep: a sorted listing reads
+them all before its first page, and its cursor names the last item of its
+page.
 
 Listings aggregate across every inbox you may read, a page at a time:
 `--limit` (1 to 100, default 50) and `--cursor` with the value the

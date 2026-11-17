@@ -262,6 +262,10 @@ heo conversation list --assignee none --linked
 heo conversation list --work-item --work-item-status open,pending
 # With --inbox, --work-item-status
 heo conversation list --inbox issues --work-item-status closed
+# With --sort
+heo conversation list --sort last-activity
+# With --updated-since, --sort
+heo conversation list --updated-since 2026-10-01T09:00:00Z --sort last-activity
 # JSON for agents
 heo conversation list --format json --limit 10
 # Basic use

@@ -29,6 +29,8 @@ const (
 	flagText         = "text"
 	flagSince        = "since"
 	flagUntil        = "until"
+	flagSort         = "sort"
+	flagUpdatedSince = "updated-since"
 	flagPlacement    = "placement"
 )
 
@@ -244,6 +246,7 @@ func deskFilter(cmd *cobra.Command) desk.Filter {
 	f.LabelAll, _ = cmd.Flags().GetStringSlice(flagLabelAll)
 	f.LabelNone, _ = cmd.Flags().GetStringSlice(flagLabelNone)
 	f.Workflow = workflowFilterOf(cmd)
+	f.Sort, _ = cmd.Flags().GetString(flagSort)
 	return f
 }
 
@@ -315,11 +318,12 @@ type conversationRow struct {
 	Assignee string `json:"assignee" yaml:"assignee" table:"ASSIGNEE"`
 	Snoozed  string `json:"snoozed"  yaml:"snoozed"  table:"SNOOZED UNTIL"`
 	Created  string `json:"created"  yaml:"created"  table:"CREATED"`
+	Activity string `json:"last_activity" yaml:"last_activity" table:"LAST ACTIVITY"`
 	Revision string `json:"revision" yaml:"revision" table:"REVISION"`
 }
 
-func conversationRowOf(c model.Conversation, w *model.WorkItem) conversationRow {
-	row := conversationRow{
+func conversationRowOf(c model.Conversation, w *model.WorkItem, activity time.Time) conversationRow {
+	row := conversationRow{Activity: stamp(activity),
 		ID: string(c.Ref.ID), Inbox: string(c.Ref.Inbox.ID), Status: c.Status, Mode: c.Mode, WorkItem: workItemCell(w), Assignee: "-", Snoozed: "-",
 		Created: stamp(c.CreatedAt), Revision: string(c.Revision),
 	}

@@ -237,7 +237,7 @@ lifecycle. Runs in the daemon (exit 70 without one). See
 heo conversation list [--inbox I] [--status S,...] [--label L,...] [--label-all L,...]
                       [--label-none L,...] [--unread] [--assignee A] [--snoozed MODE] [--linked]
                       [--work-item[=false]] [--work-item-status open|pending|resolved|closed,...]
-                      [--limit N] [--cursor C]
+                      [--sort last-activity] [--updated-since TIME] [--limit N] [--cursor C]
 heo conversation get <conversation>                 # record ID; shows the revision
 heo conversation resolve <conversation> --revision REV
 heo conversation reopen <conversation> --revision REV

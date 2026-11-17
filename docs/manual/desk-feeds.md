@@ -34,8 +34,8 @@ cursor or an event to refresh.
 | Not snoozed | exists | the default leaves snoozed ones out; `--snoozed only\|include` change it |
 | Assigned to the actor | exists | `--assignee self` |
 | Held operations alongside | partial | `operation held list` is a second read, newest change first, with `--inbox`, `--kind`, `--since`; no conversation filter reaches it from `conversation list`, and a held operation on a label or other tenant-wide target has no conversation |
-| Newest change first | missing | `conversation list` has no `--sort`; rows come in uma's own order (creation order in the probe), not by last activity |
-| Changes since a point | missing | no `--since` or `--updated-since` on `conversation list` (unknown flag, exit 2); the conversation record carries `created_at` and `revision` but no last-activity time or unread count |
+| Newest change first | exists | `conversation list --sort last-activity`; each row carries `last_activity`: the newest of its newest readable message, its snooze start and the actor's own read marker update; a new message, a read marker move or a snooze start moves it to the top; on CLI, REST and MCP |
+| Changes since a point | exists | `conversation list --updated-since TIME` keeps conversations whose `last_activity` is after it; no unread count on the record, `--unread` filters; heo derives the activity from messages, snooze and marker, reading each conversation the other filters keep |
 | One merged page | missing | conversations and held operations are two lists with two cursors; the client merges them |
 | Cursor to refresh | partial | `event list --cursor` returns committed events since a position and works on all surfaces; the events cover new messages (`message.received`), `conversation.changed`, `conversation.snoozed` and `operation.held`/`operation.decided`; marking read or unread and a snooze waking emit nothing, so an unread count cannot be kept from events alone |
 | Push | partial | `event watch` streams on the socket; not on REST or MCP, so a web or MCP client polls `event list` |

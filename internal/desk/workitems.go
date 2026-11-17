@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"hop.top/heo/internal/adapters"
 	"hop.top/heo/internal/channels"
@@ -97,6 +98,9 @@ func (f WorkItemFilter) keeps(w *model.WorkItem) bool {
 type ConversationItem struct {
 	model.Conversation
 	WorkItem *model.WorkItem `json:"work_item,omitempty" yaml:"work_item,omitempty"`
+	// LastActivity is when the conversation last changed for the caller:
+	// see Service.LastActivity.
+	LastActivity time.Time `json:"last_activity,omitzero" yaml:"last_activity,omitempty"`
 }
 
 // ListConversationItems returns one page of the conversations f and wi
@@ -112,6 +116,13 @@ func (s Service) ListConversationItems(ctx context.Context, f Filter, wi WorkIte
 				"work item status %q: want one of %s", st, strings.Join(WorkItemStatuses(), ", ")))
 		}
 	}
+	if f.Sort != "" && f.Sort != SortLastActivity {
+		return model.Page[ConversationItem]{}, model.NewError(model.Validation, fmt.Sprintf(
+			"sort %q: want %s", f.Sort, SortLastActivity))
+	}
+	if f.Sort == SortLastActivity {
+		return s.listByActivity(ctx, f, wi, page)
+	}
 	out := model.Page[ConversationItem]{Items: []ConversationItem{}}
 	next := page
 	for {
@@ -123,14 +134,12 @@ func (s Service) ListConversationItems(ctx context.Context, f Filter, wi WorkIte
 			return model.Page[ConversationItem]{}, err
 		}
 		for _, c := range p.Items {
-			var w *model.WorkItem
-			if c.Mode == model.ModePerWorkItem {
-				if w, err = s.WorkItemOf(ctx, c.Ref); err != nil {
-					return model.Page[ConversationItem]{}, err
-				}
+			it, ok, err := s.item(ctx, c, f, wi)
+			if err != nil {
+				return model.Page[ConversationItem]{}, err
 			}
-			if wi.keeps(w) {
-				out.Items = append(out.Items, ConversationItem{Conversation: c, WorkItem: w})
+			if ok {
+				out.Items = append(out.Items, it)
 			}
 		}
 		out.Next, out.Complete = p.Next, p.Complete
@@ -139,6 +148,29 @@ func (s Service) ListConversationItems(ctx context.Context, f Filter, wi WorkIte
 		}
 		next.After = p.Next
 	}
+}
+
+// item is c with its work item and last activity, and whether the work
+// item filter and --updated-since keep it.
+func (s Service) item(ctx context.Context, c model.Conversation, f Filter, wi WorkItemFilter) (ConversationItem, bool, error) {
+	var w *model.WorkItem
+	if c.Mode == model.ModePerWorkItem {
+		var err error
+		if w, err = s.WorkItemOf(ctx, c.Ref); err != nil {
+			return ConversationItem{}, false, err
+		}
+	}
+	if !wi.keeps(w) {
+		return ConversationItem{}, false, nil
+	}
+	at, err := s.LastActivity(ctx, c)
+	if err != nil {
+		return ConversationItem{}, false, err
+	}
+	if f.UpdatedSince != nil && !at.After(*f.UpdatedSince) {
+		return ConversationItem{}, false, nil
+	}
+	return ConversationItem{Conversation: c, WorkItem: w, LastActivity: at}, true, nil
 }
 
 // workItemOf returns the work item of conversation id and the

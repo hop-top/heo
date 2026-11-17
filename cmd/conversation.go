@@ -129,7 +129,21 @@ item, --work-item=false those that have none, and --work-item-status
 (` + strings.Join(desk.WorkItemStatuses(), ", ") + `; repeat or comma-separate) those whose work item
 is in one of them. uma has no filter by work item, so heo reads each
 conversation's work item and scans until the page is full; the work item
-filters combine with every filter above by AND.`,
+filters combine with every filter above by AND.
+
+Each conversation lists its last activity (last_activity): the newest of
+its newest message you may read (imported history does not count), the
+time its snooze was set and the time you last moved your own read marker
+(a snooze and a marker count only for a role that reads them). --sort
+last-activity lists the newest change first, so the list reorders when a
+message arrives, a read marker moves or a snooze starts; --updated-since
+keeps the conversations whose last activity is after a time (RFC 3339 or
+a date), for a client that refreshes incrementally. uma keeps no activity
+time to order or filter by, so heo derives it from the messages, the
+snooze and your marker, reading each conversation the other filters keep:
+--sort reads them all before the first page, and a cursor of a sorted list
+names the last item of its page, valid with the same filters and --sort.
+Marking a conversation unread moves the marker, so it counts as a change.`,
 		Example: `  heo conversation list
   heo conversation list --inbox web --status open,pending
   heo conversation list --label billing,urgent --label-none spam
@@ -139,6 +153,8 @@ filters combine with every filter above by AND.`,
   heo conversation list --assignee none --linked
   heo conversation list --work-item --work-item-status open,pending
   heo conversation list --inbox issues --work-item-status closed
+  heo conversation list --sort last-activity
+  heo conversation list --updated-since 2026-10-01T09:00:00Z --sort last-activity
   heo conversation list --format json --limit 10`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -147,6 +163,9 @@ filters combine with every filter above by AND.`,
 				return err
 			}
 			f := deskFilter(cmd)
+			if f.UpdatedSince, err = timeFlag(cmd, flagUpdatedSince); err != nil {
+				return err
+			}
 			// Every role that may read labels reads conversations; uma
 			// authorizes each conversation listed.
 			action := model.ActionConversationRead
@@ -177,7 +196,7 @@ filters combine with every filter above by AND.`,
 			}
 			rows := make([]conversationRow, 0, len(res.Items))
 			for _, cv := range res.Items {
-				rows = append(rows, conversationRowOf(cv.Conversation, cv.WorkItem))
+				rows = append(rows, conversationRowOf(cv.Conversation, cv.WorkItem, cv.LastActivity))
 			}
 			return renderPage(a, cmd, rows, res.Next, res.Complete)
 		},
@@ -191,6 +210,8 @@ filters combine with every filter above by AND.`,
 	c.Flags().Bool(flagLinked, false, "Only conversations that hold a link you may read")
 	c.Flags().Bool(flagWorkItem, false, "Only conversations that have a work item (an issue or a ticket); =false only those that have none")
 	c.Flags().StringSlice(flagWorkItemStatus, nil, "Only conversations whose work item is in these statuses: "+strings.Join(desk.WorkItemStatuses(), ", "))
+	c.Flags().String(flagSort, "", "Order the list: "+strings.Join(desk.Sorts(), ", ")+" (newest change first; default uma's own order)")
+	c.Flags().String(flagUpdatedSince, "", "Only conversations whose last activity is after this time (RFC 3339 or a date)")
 	addPageFlags(c)
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectRead)
