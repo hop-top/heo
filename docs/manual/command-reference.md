@@ -61,6 +61,21 @@ heo attachment list --message msg_123
 heo attachment list --conversation conv_123 --format json
 ```
 
+### attention
+
+| Verb | Does | Effect | Runs in | Roles | uma | Limit |
+| --- | --- | --- | --- | --- | --- | --- |
+| `heo attention list` | List what waits on you: unread conversations and held operations, newest change first | `read`, idempotent yes | daemon | desk | Conversations.List (unread, open, pending), Operations.List (held); heo merges and orders | - |
+
+```sh
+# Basic use
+heo attention list
+# With --inbox, --limit
+heo attention list --inbox support --limit 20
+# JSON for agents
+heo attention list --updated-since 2026-10-01T09:00:00Z --format json
+```
+
 ### channel
 
 | Verb | Does | Effect | Runs in | Roles | uma | Limit |

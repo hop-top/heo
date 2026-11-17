@@ -47,6 +47,12 @@ plugin](manual/hooks.md#write-a-plugin-in-any-language); `heo hook` runs, tests 
 | `heo attachment get` | Show one attachment's metadata | `read` | desk, viewer, external | `heo attachment get inb_1/att_1` |
 | `heo attachment list` | List the attachments of a message or a conversation | `read` | desk, viewer, external | `heo attachment list --message msg_123` |
 
+### attention
+
+| Verb | Does | Effect | Roles | Example |
+| --- | --- | --- | --- | --- |
+| `heo attention list` | List what waits on you: unread conversations and held operations, newest change first | `read` | desk | `heo attention list` |
+
 ### channel
 
 | Verb | Does | Effect | Roles | Example |

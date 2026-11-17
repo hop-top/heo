@@ -1,10 +1,11 @@
 # Desk feeds: what a client can read today
 
 A desk client that spans inboxes needs two feeds: an **attention feed**
-(every conversation that waits on a person) and an **activity feed**
-(what plugin actors did, and how to undo it). heo has no feed command
-for either. This page lists what the existing reads give a client over
-the CLI, REST and MCP, and what is missing.
+(every conversation that waits on a person, with the operations held
+for a decision) and an **activity feed** (what plugin actors did, and
+how to undo it). `attention list` is the attention feed; heo has no
+command for the activity feed. This page lists what the reads give a
+client over the CLI, REST and MCP, and what is missing.
 
 The findings come from one probe run against a throwaway profile with
 the fake channel adapter, two inboxes, a person and a plugin actor with
@@ -16,8 +17,8 @@ Nothing here is a promise of a future command.
 All reads below are served on the three surfaces unless a row says
 otherwise (see [surfaces.md](surfaces.md)): `conversation list`,
 `operation list`, `operation get`, `operation held list|show|history`,
-`event list` and `event get` are REST routes (GET) and MCP tools
-(`conversation.list`, `operation.held.list`, `event.list`, and so on)
+`event list`, `event get` and `attention list` are REST routes (GET) and MCP tools
+(`conversation.list`, `operation.held.list`, `event.list`, `attention.list`, and so on)
 with the same flags as the CLI. `event watch` is socket-only.
 
 ## Attention feed
@@ -33,10 +34,10 @@ cursor or an event to refresh.
 | Open or pending | exists | `--status open,pending` |
 | Not snoozed | exists | the default leaves snoozed ones out; `--snoozed only\|include` change it |
 | Assigned to the actor | exists | `--assignee self` |
-| Held operations alongside | partial | `operation held list` is a second read, newest change first, with `--inbox`, `--kind`, `--since`; no conversation filter reaches it from `conversation list`, and a held operation on a label or other tenant-wide target has no conversation |
+| Held operations alongside | exists | `attention list` returns them with the conversations: a held operation on a waiting conversation (a proposed reply, a message edit on it) is listed on that conversation's row (`held`); one with no conversation (a label create) is a row of its own, as is one on a conversation that is not waiting (read, snoozed, resolved); `operation held list` remains the full list with `--kind`, `--since` |
 | Newest change first | exists | `conversation list --sort last-activity`; each row carries `last_activity`: the newest of its newest readable message, its snooze start and the actor's own read marker update; a new message, a read marker move or a snooze start moves it to the top; on CLI, REST and MCP |
 | Changes since a point | exists | `conversation list --updated-since TIME` keeps conversations whose `last_activity` is after it; no unread count on the record, `--unread` filters; heo derives the activity from messages, snooze and marker, reading each conversation the other filters keep |
-| One merged page | missing | conversations and held operations are two lists with two cursors; the client merges them |
+| One merged page | exists | `attention list`: rows of kind `conversation` or `operation`, newest change first (`at`: for a conversation the newest of its last activity and the last change of an operation held on it), one cursor, `--inbox`, `--updated-since`, `--limit`; on CLI, REST (`GET /v1/commands/attention/list`) and MCP (`attention.list`); needs the desk role; a held operation whose target has no inbox is in no inbox's feed; heo reads every waiting conversation, its held operations and every held operation before the first page, so the cost grows with them, not with `--limit` |
 | Cursor to refresh | partial | `event list --cursor` returns committed events since a position and works on all surfaces; the events cover new messages (`message.received`), `conversation.changed`, `conversation.snoozed` and `operation.held`/`operation.decided`; marking read or unread and a snooze waking emit nothing, so an unread count cannot be kept from events alone |
 | Push | partial | `event watch` streams on the socket; not on REST or MCP, so a web or MCP client polls `event list` |
 

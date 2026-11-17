@@ -41,7 +41,7 @@ To change heo, read [docs/DEVELOPING.md](docs/DEVELOPING.md).
 
 | I want to | Run | Read |
 | --- | --- | --- |
-| see what is waiting | `heo conversation list --status open` | [conversations](docs/manual/conversations.md) |
+| see what is waiting | `heo attention list`; `heo conversation list --status open` | [conversations](docs/manual/conversations.md) |
 | read a conversation | `heo message list --conversation conv_123` | [conversations](docs/manual/conversations.md) |
 | search messages | `heo message list --text refund --since 2026-10-01` | [conversations](docs/manual/conversations.md#search-messages) |
 | reply | `heo message reply conv_123 --text "On it." --dry-run`, then without `--dry-run` | [conversations](docs/manual/conversations.md#reply) |

@@ -196,7 +196,7 @@ func newApp() *app {
 	a.r.RegisterStatusProvider(profileStatusName, a.profileStatus)
 	a.r.Cmd.AddCommand(a.configCmd(), a.daemonCmd(), a.storageCmd(), a.upgradeCmd(),
 		a.adapterCmd(), a.channelCmd(), a.inboxCmd(), a.conversationCmd(), a.labelCmd(), a.providerLabelCmd(), a.messageCmd(), a.noteCmd(), a.attachmentCmd(),
-		a.contactCmd(), a.identityCmd(), a.deliveryCmd(), a.eventCmd(), a.operationCmd())
+		a.contactCmd(), a.identityCmd(), a.deliveryCmd(), a.eventCmd(), a.operationCmd(), a.attentionCmd())
 	a.r.Cmd.AddCommand(a.reactionCmd(), a.participantCmd(), a.receiptCmd(), a.historyCmd(), a.interactionCmd())
 	a.r.Cmd.AddCommand(a.taskCmd(), a.pluginCmd(), a.hookCmd())
 	a.r.Cmd.AddCommand(a.extraCommands()...)

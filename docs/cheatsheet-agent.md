@@ -70,6 +70,7 @@ joined with dots (`conversation.list`). Both list only what you may call.
 | `heo attachment download` | `read`, idempotent yes | daemon | desk, viewer, external | Attachments.Open | - |
 | `heo attachment get` | `read`, idempotent yes | daemon | desk, viewer, external | Attachments.Open (metadata only) | - |
 | `heo attachment list` | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (attachment parts) | - |
+| `heo attention list` | `read`, idempotent yes | daemon | desk | Conversations.List (unread, open, pending), Operations.List (held); heo merges and orders | - |
 | `heo channel authorize` | `write`, idempotent no, dry-run | local | operator | none: kit's PKCE loopback login, the credential backend; channel get | terminal only |
 | `heo channel check` | `read`, idempotent yes | daemon | operator | Configuration.ChannelByKey, adapter validation; --remote opens the adapter | - |
 | `heo channel create` | `write`, idempotent conditional, dry-run | daemon | operator | Configuration.ConfigureChannel | - |

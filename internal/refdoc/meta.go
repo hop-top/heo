@@ -52,6 +52,8 @@ var verbs = map[string]Meta{
 	"adapter get":  {Offline, "none: this binary's adapter registry", ""},
 	"adapter list": {Offline, "none: this binary's adapter registry", ""},
 
+	"attention list": {Desk, "Conversations.List (unread, open, pending), Operations.List (held); heo merges and orders", ""},
+
 	"attachment download": {anyReader, "Attachments.Open", ""},
 	"attachment get":      {anyReader, "Attachments.Open (metadata only)", ""},
 	"attachment list":     {anyReader, "Messages.List (attachment parts)", ""},
@@ -294,6 +296,7 @@ var Catalog = []string{
 	"message edit", "message delete", "message raw",
 	"note list", "note get", "note add",
 	"attachment list", "attachment get", "attachment download",
+	"attention list",
 	"operation list", "operation get", "operation watch",
 	"operation held list", "operation held show", "operation held approve", "operation held edit", "operation held reject",
 	"operation held history", "operation trust list", "operation trust import", "operation trust set",
