@@ -3,6 +3,7 @@ package e2e
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -459,11 +460,11 @@ func TestOperationReadsAreScopedToTheCaller(t *testing.T) {
 			t.Errorf("other desk actor by key, kind and target = %d %v, want 404", code, body)
 		}
 		code, body = get(other, "/v1/commands/operation/list")
-		if code != http.StatusOK || strings.Contains(asString(body), "mine-1") || strings.Contains(asString(body), string(sent.Operation.ID)) {
+		if code != http.StatusOK || listedKey(body, "mine-1") || strings.Contains(asString(body), string(sent.Operation.ID)) {
 			t.Errorf("other desk actor's list = %d %v, must not show the owner's operations", code, body)
 		}
 		code, body = get(owner, "/v1/commands/operation/list")
-		if code != http.StatusOK || !strings.Contains(asString(body), "mine-1") {
+		if code != http.StatusOK || !listedKey(body, "mine-1") {
 			t.Errorf("owner's list = %d %v", code, body)
 		}
 		code, body = get(other, "/v1/commands/operation/get?arg="+string(sent.Operation.ID))
@@ -487,11 +488,11 @@ func TestOperationReadsAreScopedToTheCaller(t *testing.T) {
 			t.Fatalf("other desk actor's reply = %d %v", code, body)
 		}
 		code, body = get(other, "/v1/commands/operation/list")
-		if code != http.StatusOK || !strings.Contains(asString(body), "b-1") || strings.Contains(asString(body), "mine-1") {
+		if code != http.StatusOK || !listedKey(body, "b-1") || listedKey(body, "mine-1") {
 			t.Errorf("other desk actor's list after its write = %d %v", code, body)
 		}
 		code, body = get(other, "/v1/commands/delivery/list")
-		if code != http.StatusOK || !strings.Contains(asString(body), "b-1") || strings.Contains(asString(body), "mine-1") {
+		if code != http.StatusOK || !listedKey(body, "b-1") || listedKey(body, "mine-1") {
 			t.Errorf("other desk actor's delivery list after its write = %d %v", code, body)
 		}
 		code, body = get(other, "/v1/commands/operation/get?key=b-1")
@@ -499,7 +500,7 @@ func TestOperationReadsAreScopedToTheCaller(t *testing.T) {
 			t.Errorf("other desk actor by its own key = %d %v", code, body)
 		}
 		code, body = get(owner, "/v1/commands/operation/list")
-		if code != http.StatusOK || strings.Contains(asString(body), "b-1") {
+		if code != http.StatusOK || listedKey(body, "b-1") {
 			t.Errorf("owner's list = %d %v, must not show the other actor's write", code, body)
 		}
 		code, body = get(owner, "/v1/commands/operation/get?key=b-1")
@@ -532,5 +533,36 @@ func mustJSON(t *testing.T, s string, v any) {
 	t.Helper()
 	if err := json.Unmarshal([]byte(s), v); err != nil {
 		t.Fatalf("%v\n%s", err, s)
+	}
+}
+
+// listedKey reports whether a list response (data.items) has an item whose
+// key is exactly key. A substring match on the whole body is not enough:
+// random ids in the same body can contain short keys like "b-1".
+func listedKey(body map[string]any, key string) bool {
+	data, _ := body["data"].(map[string]any)
+	items, _ := data["items"].([]any)
+	for _, it := range items {
+		if m, ok := it.(map[string]any); ok && fmt.Sprint(m["key"]) == key {
+			return true
+		}
+	}
+	return false
+}
+
+// TestListedKeyIgnoresIDSubstrings: a random id in the body that happens
+// to contain a short key (here "b-1" inside "91ab-12af") is not a listed key.
+func TestListedKeyIgnoresIDSubstrings(t *testing.T) {
+	body := map[string]any{"data": map[string]any{"items": []any{
+		map[string]any{"key": "mine-1", "target": "channel:01a1ea32-3aff-710e-91ab-12af89f614df"},
+	}}}
+	if !strings.Contains(asString(body), "b-1") {
+		t.Fatal("fixture no longer has the substring this test guards against")
+	}
+	if listedKey(body, "b-1") {
+		t.Error(`listedKey found "b-1" inside an id`)
+	}
+	if !listedKey(body, "mine-1") {
+		t.Error(`listedKey missed the listed key "mine-1"`)
 	}
 }
