@@ -271,6 +271,8 @@ heo conversation list --label-all billing,urgent
 heo conversation list --unread --assignee self
 # With --snoozed
 heo conversation list --snoozed only
+# With --snooze-ended
+heo conversation list --snooze-ended
 # With --assignee, --linked
 heo conversation list --assignee none --linked
 # With --work-item, --work-item-status

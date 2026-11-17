@@ -327,7 +327,8 @@ func TestWorkflowAssignAndSnooze(t *testing.T) {
 		}
 
 		// The snooze holds across a restart; an inbound message wakes it
-		// before its time, with no event.
+		// before its time; the sweep emits conversation.snooze_ended
+		// (TestSnoozeWakeEmitsEventsFromTheDaemon), which no workflow kind here is.
 		s.restartAs(workflowProfile)
 		if got := s.listed(); !slices.Equal(got, refIDs(b)) {
 			t.Fatalf("after a restart the default list = %v", got)
@@ -348,7 +349,8 @@ func TestWorkflowAssignAndSnooze(t *testing.T) {
 			t.Errorf("waking emitted %d events", got-events)
 		}
 
-		// Expiry, after a restart: nothing was scheduled, nothing runs.
+		// Expiry, after a restart: nothing was scheduled; the list reads the
+		// clock.
 		soon := time.Now().Add(5 * time.Second).UTC().Format(time.RFC3339Nano)
 		s.json(&out, "conversation", "snooze", aid, "--until", soon)
 		if !slices.Equal(s.listed(), refIDs(b)) {

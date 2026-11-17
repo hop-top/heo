@@ -16,10 +16,15 @@
 //     attachment name or bytes, a contact's name or attributes and a
 //     label's name are never in it;
 //   - the conversation workflow events (assigned, unassigned, snoozed,
-//     unsnoozed, linked, unlinked) name the conversation and the
-//     operation, and not who was assigned, until when or the far end of
-//     a link; uma emits them internal, so they go out desk only, and
-//     marking a conversation read or unread emits no event;
+//     unsnoozed, snooze_ended, linked, unlinked) name the conversation
+//     and, when a command made the change, the operation, and not who
+//     was assigned, until when, why a snooze ended or the far end of a
+//     link; uma emits them internal, so they go out desk only. Marking a
+//     conversation read or unread emits conversation.read_marked and
+//     conversation.unread_marked, which uma delivers to the marker's own
+//     actor alone: the bridge reads as its own actor, never a marker's,
+//     so they do not reach the bus; the mapping names the conversation
+//     and not the actor, for a consumer that is the marker's actor;
 //   - the audience is the topic: public events go out under
 //     uma.public.<object>.<action>, everything else under
 //     uma.desk.<object>.<action>, and a subscriber that is not desk
@@ -188,6 +193,18 @@ func refs(ev model.Event, p *Payload) {
 		if read(&v) {
 			p.Conversation = string(v.Conversation.ID)
 			op(v.Operation)
+		}
+	case model.EventConversationSnoozeEnded:
+		// Not the cause or when: the consumer reads the conversation.
+		var v model.ConversationSnoozeEndedPayload
+		if read(&v) {
+			p.Conversation = string(v.Conversation.ID)
+		}
+	case model.EventConversationReadMarked, model.EventConversationUnreadMarked:
+		// Not whose marker: uma delivers it to that actor alone.
+		var v model.ReadMarkerPayload
+		if read(&v) {
+			p.Conversation = string(v.Conversation.ID)
 		}
 	case model.EventConversationLinked, model.EventConversationUnlinked:
 		// Not the far end: it may be a conversation or work item the

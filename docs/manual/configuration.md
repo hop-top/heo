@@ -73,7 +73,7 @@ secret store and reference them. Changes apply when the daemon starts.
 | `services.webhook.enabled` | `false` |
 | `services.hooks.enabled` | `false`: the hook runner starts the `plugins:` section's plugins, one durable subscription each (see [runtime.md](runtime.md#hook-runner)) |
 | `services.workers.count` / `poll` / `lease` / `drain_timeout` | `4` / `1s` / `1m` / `20s` |
-| `services.workers.held_sweep_every` | `0s`: how often workers expire held operations past their deadline; `0s` is uma's own cadence (1m), `off` runs no sweep |
+| `services.workers.held_sweep_every` | `0s`: how often workers expire held operations past their deadline and wake snoozed conversations whose snooze ended; `0s` is uma's own cadence (1m), `off` runs neither sweep (no `conversation.snooze_ended` event, and an ended snooze stays on the record) |
 | `services.receivers.settle_timeout` | `10s`: how long a channel retrying a failed start holds readiness; below `services.receivers.ready_timeout` |
 | `services.receivers.start_spread` | `5m`: window over which the daemon start spreads the first connection of Gmail and Graph receivers, each at a stable per-channel point in it (uma's start spread), so the first polls of many mailboxes do not fall in the same second; `0s` starts them all at once; never delays readiness |
 | `services.webhook.addr` | `127.0.0.1:8083` (loopback; `allow_remote: true` for another) |

@@ -55,6 +55,12 @@ type WorkflowFilter struct {
 	// default: SnoozeExclude for a caller that may read workflow state,
 	// no filter for one that may not (they see no snooze).
 	Snoozed string
+	// SnoozeEnded, when set, keeps the conversations whose snooze has
+	// run out or been ended by an inbound message and that the runtime's
+	// sweep has not yet cleared (true), or the others (false). Such a
+	// conversation is transient: the sweep clears the snooze and emits
+	// conversation.snooze_ended.
+	SnoozeEnded *bool
 	// Linked, when set, keeps the conversations holding a link (true) or
 	// none (false).
 	Linked *bool
@@ -63,7 +69,7 @@ type WorkflowFilter struct {
 // Asked reports whether f asks for a filter that needs the right to read
 // workflow state: any but the default and --snoozed=include.
 func (f WorkflowFilter) Asked() bool {
-	return f.Unread || f.Assignee != "" || f.Linked != nil || f.Snoozed == SnoozeOnly || f.Snoozed == SnoozeExclude
+	return f.Unread || f.Assignee != "" || f.Linked != nil || f.SnoozeEnded != nil || f.Snoozed == SnoozeOnly || f.Snoozed == SnoozeExclude
 }
 
 // can reports whether heo's policy lets the caller perform action.
@@ -91,7 +97,7 @@ func (s Service) workflowFilter(f WorkflowFilter, out *model.Filter) error {
 		return model.NewError(model.Validation, fmt.Sprintf("snoozed %q: want one of %s", f.Snoozed, strings.Join(SnoozeModes(), ", ")))
 	}
 	if f.Asked() && !s.CanReadWorkflow() {
-		return model.NewError(model.Unauthorized, "the workflow filters (unread, assignee, snoozed, linked) need the right to read workflow state (conversation.read_workflow): the desk and viewer roles hold it")
+		return model.NewError(model.Unauthorized, "the workflow filters (unread, assignee, snoozed, snooze-ended, linked) need the right to read workflow state (conversation.read_workflow): the desk and viewer roles hold it")
 	}
 	switch f.Snoozed {
 	case SnoozeOnly:
@@ -121,6 +127,9 @@ func (s Service) workflowFilter(f WorkflowFilter, out *model.Filter) error {
 	}
 	if f.Linked != nil {
 		out.Linked = boolPtr(*f.Linked)
+	}
+	if f.SnoozeEnded != nil {
+		out.SnoozeEnded = boolPtr(*f.SnoozeEnded)
 	}
 	return nil
 }
@@ -313,8 +322,8 @@ func (s Service) PlanUnsnooze(ctx context.Context, id string, rev model.Revision
 
 // Snooze submits p, a snooze or an unsnooze, and returns the conversation
 // as it is after it. Nothing is scheduled: uma evaluates the snooze when
-// the conversation is read, so it holds across restarts and its end emits
-// no event.
+// the conversation is read, so it holds across restarts; the runtime's
+// sweep clears an ended snooze and emits conversation.snooze_ended.
 func (s Service) Snooze(ctx context.Context, p SnoozePlan) (model.Conversation, model.Acceptance, error) {
 	submit := s.Client.Conversations().Snooze
 	if p.Request.Until == nil {
@@ -487,7 +496,8 @@ type ReadMarkPlan struct {
 // conversation id: read through the message msg (record ID, in that
 // conversation) or, when empty, through now; or, with unread, from msg on
 // or from the newest live inbound message. The marker is the caller's
-// own: it moves nothing else, emits no event and sends no receipt.
+// own: it moves nothing else and sends no receipt; an actual move emits one
+// read_marked or unread_marked event, which uma delivers to that actor alone.
 func (s Service) PlanReadMark(ctx context.Context, id, msg string, unread bool) (ReadMarkPlan, error) {
 	conv, err := s.FindConversation(ctx, id)
 	if err != nil {

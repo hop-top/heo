@@ -439,7 +439,8 @@ key and no content.
 An operation with no decision after `held_operations.expiry` (default
 `72h`) moves to `expired`. The daemon's workers run the sweep every
 `services.workers.held_sweep_every`: `0s`, the default, is uma's own
-cadence of one minute; `off` runs none. An expired operation counts
+cadence of one minute; `off` runs none; the same sweep ends snoozes that
+ran out. An expired operation counts
 neither for nor against trust, applies nothing and no longer blocks a
 new proposal for the same target. A decision on it is refused as a
 conflict.

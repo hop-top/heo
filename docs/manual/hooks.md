@@ -139,6 +139,9 @@ kind an extension registers, is not offered to plugins.
 | `conversation.unassigned` | desk | `conversation`, `operation` | an assignee was cleared |
 | `conversation.snoozed` | desk | `conversation`, `operation` | a snooze was set |
 | `conversation.unsnoozed` | desk | `conversation`, `operation` | a snooze was ended early |
+| `conversation.snooze_ended` | desk | `conversation` | a snooze ended by itself: its time passed, or a live inbound message arrived; the runtime's sweep clears it, once |
+| `conversation.read_marked` | desk | `conversation` | a desk actor's read marker moved forward; uma delivers it to that actor alone, so no plugin receives it |
+| `conversation.unread_marked` | desk | `conversation` | a desk actor's read marker moved back; as `conversation.read_marked` |
 | `conversation.linked` | desk | `conversation`, `operation` | a link was added, once per conversation end |
 | `conversation.unlinked` | desk | `conversation`, `operation` | a link was removed, once per conversation end |
 | `delivery.updated` | record | `operation` | an outbound write changed state |
