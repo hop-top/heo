@@ -428,9 +428,14 @@ func (s Service) checkRemote(ctx context.Context, ch model.Channel, inboxes []mo
 		add(SeverityError, "capabilities", string(model.CodeOf(err)), "capability probe failed: "+safeMessage(err))
 	}
 	required := s.required(ch, inboxes)
+	receivable := receivesAny(statuses)
 	for _, st := range statuses {
 		cp := Capability{Name: st.Name, Available: st.Available, Reason: st.Reason, Required: required[st.Name]}
 		r.Capabilities = append(r.Capabilities, cp)
+		// Receiving is needed by either way: one working covers it.
+		if isReceiveWay(st.Name) && receivable {
+			continue
+		}
 		if cp.Required && !cp.Available {
 			add(SeverityError, "capability:"+string(st.Name), string(st.Reason),
 				fmt.Sprintf("%s is unavailable (%s), and the channel's configuration needs it", st.Name, st.Reason))
@@ -593,6 +598,18 @@ func (s Service) checkReceiving(ctx context.Context, ch model.Channel, required 
 			add(SeverityWarning, scope, "receiver_degraded", fmt.Sprintf("%s is degraded: %s", way, st.Reason))
 		}
 	}
+}
+
+func isReceiveWay(c model.Capability) bool {
+	return c == model.CapabilityReceive || c == model.CapabilityReceiveHTTP
+}
+
+// receivesAny reports whether one way of receiving is available in the
+// statuses.
+func receivesAny(statuses []model.CapabilityStatus) bool {
+	return slices.ContainsFunc(statuses, func(st model.CapabilityStatus) bool {
+		return isReceiveWay(st.Name) && st.Available
+	})
 }
 
 // switchedOff is the ways of receiving the statuses report off by the

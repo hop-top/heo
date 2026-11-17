@@ -398,6 +398,46 @@ func TestCheckRemoteReportsReceiving(t *testing.T) {
 	}
 }
 
+// TestCheckRemoteReceivingNeedsOneWay: an inbox with destinations needs
+// the channel to receive, by either way. A way unavailable while the
+// other works (a polling mailbox with no push topic, a socket channel
+// with the request URL switched off) raises no capability finding; only
+// every declared way being unavailable does.
+func TestCheckRemoteReceivingNeedsOneWay(t *testing.T) {
+	w := newWorld(t)
+	ctx := context.Background()
+	w.createTyped("poll", adapterstest.Type, adapterstest.Config{Account: "a", NoWebhook: true})
+	w.createTyped("socket", adapterstest.Type, adapterstest.Config{Account: "b", Disabled: []model.Capability{model.CapabilityReceiveHTTP}})
+	w.createTyped("none", adapterstest.Type, adapterstest.Config{
+		Account: "c", NoWebhook: true, Disabled: []model.Capability{model.CapabilityReceive},
+	})
+	w.createInbox("poll", "poll-in", "dest-a")
+	w.createInbox("socket", "socket-in", "dest-b")
+	w.createInbox("none", "none-in", "dest-c")
+	s := w.as(operator)
+	for _, key := range []string{"poll", "socket"} {
+		got, err := s.Check(ctx, key, channels.CheckOptions{Remote: true})
+		if err != nil {
+			t.Fatalf("%s: %v", key, err)
+		}
+		for _, f := range got[0].Findings {
+			if strings.HasPrefix(f.Scope, "capability:receive") {
+				t.Errorf("%s: a channel that receives one way raised %+v", key, f)
+			}
+		}
+		if !got[0].OK {
+			t.Errorf("%s: check not OK: %+v", key, got[0].Findings)
+		}
+	}
+	got, err := s.Check(ctx, "none", channels.CheckOptions{Remote: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got[0].OK || !hasFinding(got[0], channels.SeverityError, "capability:receive", string(model.Disabled)) {
+		t.Errorf("a channel that cannot receive = %+v, want an error finding", got[0].Findings)
+	}
+}
+
 // statusDiag reports every purpose with one status.
 type statusDiag struct{ status credentials.Status }
 

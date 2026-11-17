@@ -965,7 +965,8 @@ func (i *instance) Probe(context.Context) ([]model.CapabilityStatus, error) {
 	caps := i.f.capabilities()
 	out := make([]model.CapabilityStatus, 0, len(caps))
 	for _, name := range caps {
-		if slices.Contains(c.Disabled, name) || slices.Contains(c.Withdrawn, name) {
+		if slices.Contains(c.Disabled, name) || slices.Contains(c.Withdrawn, name) ||
+			(name == model.CapabilityReceiveHTTP && c.NoWebhook) {
 			// The probe speaks of permissions it found; it leaves what
 			// the instance itself reported as it is.
 			continue
