@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"encoding/json"
 	"slices"
 	"strings"
 	"testing"
@@ -110,6 +111,10 @@ func TestWorkflowLinksAndReadMarkers(t *testing.T) {
 		first := s.messages("--conversation", aid)[0].Ref.ID
 		bFirst := s.messages("--conversation", bid)[0].Ref.ID
 		events, ops := len(s.eventsOf(workflowKinds...)), s.operationCount()
+		markerKinds := []string{model.EventConversationReadMarked, model.EventConversationUnreadMarked}
+		if n := len(s.eventsOf(markerKinds...)); n != 0 {
+			t.Fatalf("%d marker events before any mark", n)
+		}
 		revA := s.view(a.ID).Revision
 		s.json(&plan, "conversation", "mark-read", aid, "--dry-run")
 		if len(plan.Effects) != 1 || !strings.Contains(string(plan.Args["current"]), "never marked") || !strings.Contains(string(plan.Args["new"]), "now") ||
@@ -120,7 +125,15 @@ func TestWorkflowLinksAndReadMarkers(t *testing.T) {
 			t.Fatalf("--dry-run wrote a marker: %+v", v.Read)
 		}
 		var mark readMarkOutJSON
-		s.json(&mark, "conversation", "mark-read", aid)
+		moves := 0
+		markIt := func(args ...string) {
+			s.t.Helper()
+			s.json(&mark, append([]string{"conversation"}, args...)...)
+			if mark.Changed {
+				moves++
+			}
+		}
+		markIt("mark-read", aid)
 		if mark.Conversation != a.ID || string(mark.Actor) != me() || mark.ReadThrough.IsZero() || !mark.Changed {
 			t.Fatalf("mark-read = %+v", mark)
 		}
@@ -140,28 +153,28 @@ func TestWorkflowLinksAndReadMarkers(t *testing.T) {
 		if got := waitListed(t, s, []string{"--unread"}, refIDs(a, b)); got != nil {
 			t.Fatalf("--unread after a new message = %v", got)
 		}
-		s.json(&mark, "conversation", "mark-read", aid, "--through", string(first))
+		markIt("mark-read", aid, "--through", string(first))
 		if !mark.Changed {
 			t.Fatalf("mark-read --through = %+v", mark)
 		}
 		through := mark.ReadThrough
-		s.json(&mark, "conversation", "mark-read", aid, "--through", string(first))
+		markIt("mark-read", aid, "--through", string(first))
 		if mark.Changed || !mark.ReadThrough.Equal(through) || len(mark.Notes) != 1 {
 			t.Fatalf("the same mark twice = %+v", mark)
 		}
 		if got := s.listed("--unread"); !slices.Equal(got, refIDs(a, b)) {
 			t.Fatalf("--unread after reading through the first message = %v", got)
 		}
-		s.json(&mark, "conversation", "mark-read", aid)
-		s.json(&mark, "conversation", "mark-read", bid)
+		markIt("mark-read", aid)
+		markIt("mark-read", bid)
 		if got := s.listed("--unread"); got != nil {
 			t.Fatalf("--unread after reading both = %v", got)
 		}
-		s.json(&mark, "conversation", "mark-unread", bid, "--from", string(bFirst))
+		markIt("mark-unread", bid, "--from", string(bFirst))
 		if got := s.listed("--unread"); !slices.Equal(got, refIDs(b)) {
 			t.Fatalf("--unread after mark-unread --from = %v", got)
 		}
-		s.json(&mark, "conversation", "mark-unread", aid)
+		markIt("mark-unread", aid)
 		if got := s.listed("--unread"); !slices.Equal(got, refIDs(a, b)) {
 			t.Fatalf("--unread after mark-unread = %v", got)
 		}
@@ -169,10 +182,34 @@ func TestWorkflowLinksAndReadMarkers(t *testing.T) {
 		wantExit(t, s.heo(3, "conversation", "mark-unread", aid, "--from", "msg_404"), 3, "NOT_FOUND")
 		wantExit(t, s.heo(3, "conversation", "mark-read", "conv_404"), 3, "NOT_FOUND")
 
-		// A marker is local and the caller's: no event, no operation (no
-		// receipt), no revision.
+		// A marker is local and the caller's: one marker event per actual
+		// move (none for a mark that changed nothing) and no workflow event,
+		// no operation (no receipt), no revision.
 		if got := len(s.eventsOf(workflowKinds...)); got != events {
 			t.Errorf("marking emitted %d workflow events", got-events)
+		}
+		if moves < 5 {
+			t.Fatalf("only %d marks moved the marker", moves)
+		}
+		marks := s.eventsOf(markerKinds...)
+		reads, unreads := 0, 0
+		for _, ev := range marks {
+			var mp model.ReadMarkerPayload
+			if err := json.Unmarshal(ev.Payload.Data, &mp); err != nil || string(mp.Actor) != me() || mp.Revision == "" ||
+				(mp.Conversation.ID != a.ID && mp.Conversation.ID != b.ID) || ev.Audience.Visibility != model.Internal {
+				t.Errorf("marker event = %+v (%v)", ev, err)
+			}
+			if ev.Kind == model.EventConversationUnreadMarked {
+				unreads++
+			} else {
+				reads++
+			}
+		}
+		if len(marks) != moves || unreads != 2 {
+			t.Errorf("%d marker events (%d unread), want one per move: %d (2 unread)", len(marks), unreads, moves)
+		}
+		if got := len(s.eventsOfInbox(string(a.Inbox.ID), markerKinds...)); got != len(marks) {
+			t.Errorf("--inbox lists %d marker events of %d", got, len(marks))
 		}
 		if got := s.operationCount(); got != ops {
 			t.Errorf("marking queued %d operations", got-ops)
@@ -196,4 +233,11 @@ func waitListed(t *testing.T, s *deskSite, args []string, want []model.ID) []mod
 		time.Sleep(100 * time.Millisecond)
 	}
 	return got
+}
+
+// eventsOfInbox lists the events of kinds in one inbox (key or ID).
+func (s *deskSite) eventsOfInbox(inbox string, kinds ...string) []model.Event {
+	s.t.Helper()
+	all, _ := s.listAllEvents("100", "--inbox", inbox, "--kind", strings.Join(kinds, ","))
+	return all
 }

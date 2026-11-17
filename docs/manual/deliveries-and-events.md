@@ -352,6 +352,41 @@ format; the events it may not read are skipped as if absent. `event list`
 is a plain request and reply, so REST, gRPC, MCP and the control socket
 all serve it.
 
+### Read state and wake events
+
+Three events let a client keep an unread or waiting count from events
+alone, without listing again. All are internal, desk only, and carry
+references, never a message body:
+
+| Kind | One per | Payload | Who reads it |
+| --- | --- | --- | --- |
+| `conversation.read_marked` | actual move of an actor's read marker forward (`conversation mark-read`) | `conversation`, `actor`, `revision` (the marker's new revision) | the marker's own actor alone |
+| `conversation.unread_marked` | actual move of the marker back (`conversation mark-unread`) | as above | the marker's own actor alone |
+| `conversation.snooze_ended` | snooze that ended by itself | `conversation`, `cause` (`until` or `message`), `until`, `previous_revision` | desk and viewer, like the other workflow events |
+
+A mark that leaves the marker as it was emits nothing, and another desk
+actor never lists or watches your marker events: its list is empty of
+them whatever it asks for. The event carries the conversation's inbox,
+so `--inbox` and `--kind` narrow them:
+
+```sh
+heo event list --from beginning --inbox support \
+  --kind conversation.read_marked,conversation.unread_marked,conversation.snooze_ended
+```
+
+The marker's `revision` is the one `conversation get` shows as the read
+marker's, so a client ordering marker events by it keeps the latest. The
+conversation's own revision does not move when a marker does.
+
+A snooze ends when its time passes or a live inbound message arrives
+after it (an imported message never does). The daemon's workers run the
+sweep that clears the snooze and emits `conversation.snooze_ended`, on
+the `services.workers.held_sweep_every` cadence (one minute by default),
+so the event follows the end by up to a sweep; until then
+`conversation list --snooze-ended` lists the conversation. With
+`held_sweep_every: off` no sweep runs: no event, and the ended snooze
+stays on the record.
+
 ## Get one event
 
 ```sh
@@ -529,9 +564,13 @@ internal note), `conversation.label_added` is
 `uma.desk.conversation.label_added`, and `interaction.received` is
 `uma.public.interaction.received` for an interaction the provider reports
 as public (the web widget's are); the conversation workflow events
-(`conversation.assigned`, `unassigned`, `snoozed`, `unsnoozed`, `linked`,
-`unlinked`) are internal, so they go out under `uma.desk` too. Marking a
-conversation read or unread, and a snooze ending, emit no event. A kind that is not an object and
+(`conversation.assigned`, `unassigned`, `snoozed`, `unsnoozed`,
+`snooze_ended`, `linked`, `unlinked`) are internal, so they go out under
+`uma.desk` too. Marking a conversation read or unread emits
+`conversation.read_marked` and `conversation.unread_marked`, once per
+actual move of the marker; uma delivers them to the marker's own actor
+alone, and the bridge is not one, so they are in `event list` and
+`event watch` and never on the bus. A kind that is not an object and
 action pair, such as a namespaced extension kind, goes out as
 `extension.emitted`, with its kind in the payload. Patterns follow kit's
 bus: `*` matches one segment, `#` the trailing segments.
@@ -620,7 +659,9 @@ until a human decides.
 A held operation expires after `held_operations.expiry` with no
 decision: uma's sweep, which the daemon's workers run every
 `services.workers.held_sweep_every` (`0s`, the default, is uma's own
-cadence of one minute; `off` runs none), moves it to `expired`. An
+cadence of one minute; `off` runs none), moves it to `expired`. The same
+sweep wakes snoozed conversations (see [Read state and wake
+events](#read-state-and-wake-events)). An
 expired operation counts neither for nor against trust, and no longer
 blocks a new proposal.
 

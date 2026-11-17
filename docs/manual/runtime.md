@@ -104,7 +104,7 @@ services:
     poll: 1s             # idle wait between claims
     lease: 1m            # a claim's hold on its item; at least 5s
     drain_timeout: 20s   # bound on the drain at shutdown
-    held_sweep_every: 0s # held-operation expiry sweep; 0s is uma's 1m, off for none
+    held_sweep_every: 0s # held-operation expiry and snooze wake sweep; 0s is uma's 1m, off for none
 ```
 
 Each worker claims one item at a time. Work a crashed daemon held is

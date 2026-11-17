@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"hop.top/uma/model"
 )
 
 const (
@@ -120,7 +122,7 @@ func TestWorkflowStateAcrossRolesAndSurfaces(t *testing.T) {
 		s.json(&mark, "conversation", "mark-read", aid)
 
 		// The bus: references on the desk topics, none public, nothing
-		// of who or until when; marking read emits nothing.
+		// of who or until when; marking read emits no bus event.
 		l := s.await("the workflow events", func(l busLog) bool {
 			return len(l.find("desk", "uma.desk.conversation.assigned", "", "")) > 0 &&
 				len(l.find("desk", "uma.desk.conversation.snoozed", "", "")) > 0 &&
@@ -178,6 +180,21 @@ func TestWorkflowStateAcrossRolesAndSurfaces(t *testing.T) {
 				}
 			}
 		}
+		// The marker's event is its actor's alone, on every surface: the
+		// user who marked lists it, a second desk actor, a viewer and an
+		// external actor do not.
+		markerFlags := map[string]any{"from": "beginning", "kind": model.EventConversationReadMarked}
+		for who, tc := range map[string]struct {
+			token string
+			want  bool
+		}{"desk": {desk, true}, "peer": {peer, false}, "viewer": {view, false}, "external": {ext, false}} {
+			for surf, r := range surfaceCall(t, x, tc.token, []string{"event", "list"}, nil, markerFlags) {
+				if has := strings.Contains(r.Body, model.EventConversationReadMarked); r.Code != http.StatusOK || has != tc.want {
+					t.Errorf("%s %s: event list shows a read marker event = %v (%d), want %v\n%s", who, surf, has, r.Code, tc.want, r.Body)
+				}
+			}
+		}
+
 		// The peer's own read state is its own: never marked, though the
 		// test's user marked the conversation.
 		for surf, r := range surfaceCall(t, x, peer, get, []string{aid}, nil) {

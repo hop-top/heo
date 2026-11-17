@@ -475,10 +475,11 @@ func TestReadMarksArePerActor(t *testing.T) {
 		t.Errorf("unknown message: %v", err)
 	}
 
-	// No event, no operation, no provider effect: a read marker is local
-	// and per actor, never a receipt.
-	if got := w.eventCount(); got != events {
-		t.Errorf("marking wrote %d events", got-events)
+	// One event per actual move (read, unread, read through), no
+	// operation, no provider effect: a read marker is local and per
+	// actor, never a receipt.
+	if got := w.eventCount(); got != events+3 {
+		t.Errorf("marking wrote %d events, want 3 (one per move)", got-events)
 	}
 	if got := w.operationCount(); got != ops {
 		t.Errorf("marking queued %d operations", got-ops)

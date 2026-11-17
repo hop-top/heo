@@ -263,6 +263,10 @@ func workflowFilterOf(cmd *cobra.Command) desk.WorkflowFilter {
 	if l, _ := cmd.Flags().GetBool(flagLinked); l {
 		w.Linked = &l
 	}
+	if cmd.Flags().Changed(flagSnoozeEnded) {
+		e, _ := cmd.Flags().GetBool(flagSnoozeEnded)
+		w.SnoozeEnded = &e
+	}
 	return w
 }
 

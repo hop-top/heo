@@ -51,6 +51,9 @@ func TestTopicsFollowKitNotation(t *testing.T) {
 		model.EventConversationUnassigned:   "uma.public.conversation.unassigned",
 		model.EventConversationSnoozed:      "uma.public.conversation.snoozed",
 		model.EventConversationUnsnoozed:    "uma.public.conversation.unsnoozed",
+		model.EventConversationSnoozeEnded:  "uma.public.conversation.snooze_ended",
+		model.EventConversationReadMarked:   "uma.public.conversation.read_marked",
+		model.EventConversationUnreadMarked: "uma.public.conversation.unread_marked",
 		model.EventConversationLinked:       "uma.public.conversation.linked",
 		model.EventConversationUnlinked:     "uma.public.conversation.unlinked",
 		model.EventDeliveryUpdated:          "uma.public.delivery.updated",
@@ -168,6 +171,32 @@ func TestPayloadIsReferences(t *testing.T) {
 		}
 	}
 
+	// The read-state events name the conversation alone: not whose marker
+	// it is, not why or when a snooze ended, and no operation (none made
+	// them).
+	for kind, payload := range map[string]model.Extension{
+		model.EventConversationSnoozeEnded: ext(t, model.SchemaConversationSnoozeEnded, model.ConversationSnoozeEndedPayload{
+			Conversation: convRef, Cause: model.WakeCauseUntil, Until: until, Trigger: model.TriggerSystem, PreviousRevision: "rev-1"}),
+		model.EventConversationReadMarked: ext(t, model.SchemaConversationReadMarked, model.ReadMarkerPayload{
+			Conversation: convRef, Actor: assignee, Revision: "rev-9"}),
+		model.EventConversationUnreadMarked: ext(t, model.SchemaConversationUnreadMarked, model.ReadMarkerPayload{
+			Conversation: convRef, Actor: assignee, Revision: "rev-9"}),
+	} {
+		topic, wp := bridge.Map(umaEvent(kind, model.Internal, convRes, payload))
+		if want := bus.Topic("uma.desk." + kind); topic != want {
+			t.Errorf("%s: topic %q, want %q", kind, topic, want)
+		}
+		want := bridge.Payload{
+			Event: "ev-1", Kind: kind, Tenant: "acme", Inbox: "in-1",
+			Resource:     bridge.Resource{Kind: "conversation", ID: "conv-1", Inbox: "in-1"},
+			Conversation: "conv-1",
+			Revision:     "rev-2", OccurredAt: time.Unix(100, 0).UTC(), RecordedAt: time.Unix(101, 0).UTC(),
+		}
+		if wp != want {
+			t.Errorf("%s: payload = %+v\nwant      %+v", kind, wp, want)
+		}
+	}
+
 	deliv := ext(t, model.SchemaDeliveryUpdated, model.DeliveryUpdatedPayload{
 		Operation: model.OperationRef{Tenant: "acme", ID: "op-3"}, State: "failed",
 		Failure: &model.DeliveryFailure{Code: model.Permanent, SafeMessage: "mailbox ada@example.com refused"},
@@ -207,6 +236,7 @@ func TestPayloadCarriesNoContent(t *testing.T) {
 		model.EventConversationLabelAdded, model.EventConversationLabelRemoved, model.EventDeliveryUpdated,
 		model.EventConversationAssigned, model.EventConversationUnassigned, model.EventConversationSnoozed,
 		model.EventConversationUnsnoozed, model.EventConversationLinked, model.EventConversationUnlinked,
+		model.EventConversationSnoozeEnded, model.EventConversationReadMarked, model.EventConversationUnreadMarked,
 		model.EventWorkItemUpdated, model.EventIdentityLinked, model.EventContactCreated, model.EventContactUpdated,
 		model.EventContactMerged, model.EventTaskUpdated, model.EventInteractionReceived, model.EventInteractionUpdated,
 		"org.example.sample.thing", "no.such.thing",

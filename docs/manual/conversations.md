@@ -767,7 +767,8 @@ change applies to whatever the conversation is.
   inbound message is recorded after the snooze, whichever is first;
   history imported with `history fetch` never wakes it. Nothing is
   scheduled: uma works the wake out when it reads the conversation, so a
-  snooze survives a restart and waking emits no event. `--for` resolves a
+  snooze survives a restart; the daemon's sweep clears an ended snooze
+  within a minute and emits `conversation.snooze_ended`. `--for` resolves a
   new time on every run, so replay a snooze with `--until`, the time the
   output prints. A snooze is independent of the status.
 - **Link.** A link relates a conversation to another conversation or
@@ -784,8 +785,10 @@ change applies to whatever the conversation is.
   before the newest live inbound message, or before `--from`. Messages
   imported from a provider's history never count as unread. The marker
   is local: it sends no receipt to the provider (`receipt send` does
-  that), does not change the conversation or its revision, and emits no
-  event. The same mark again changes nothing.
+  that), does not change the conversation or its revision, and emits one
+  `conversation.read_marked` or `conversation.unread_marked` event per
+  actual move, readable by you alone. The same mark again changes nothing
+  and emits nothing.
 
 `conversation get` shows the assignee, the snooze while it is in effect,
 the links you may read and, for a desk actor, its own read marker.
@@ -796,6 +799,7 @@ the links you may read and, for a desk actor, its own read marker.
 heo conversation list --unread                 # unread for you
 heo conversation list --assignee self          # your queue; or an actor ID, or none
 heo conversation list --snoozed only           # include | only | exclude (default)
+heo conversation list --snooze-ended           # snooze over, not yet woken (transient)
 heo conversation list --linked
 heo conversation list --assignee none --status open --inbox web --label billing
 ```
@@ -803,7 +807,11 @@ heo conversation list --assignee none --status open --inbox web --label billing
 uma applies them, evaluated by the store, so pages are full; heo never
 filters a page itself. They combine with `--inbox`, `--status` and the
 label filters by AND. The default hides snoozed conversations;
-`--snoozed include` lists them with the rest. `--linked` keeps the
+`--snoozed include` lists them with the rest. `--snooze-ended` keeps the
+conversations whose snooze ran out, or was ended by a live inbound
+message, and that the daemon's sweep has not yet cleared: transient, gone
+within a sweep (`services.workers.held_sweep_every`, one minute by
+default); `--snooze-ended=false` keeps the others. `--linked` keeps the
 conversations that hold a link you may read. `--unread` is unread for
 you: the marker you keep, and messages from others recorded after it.
 
@@ -813,7 +821,7 @@ The desk sees and changes all of it. A `viewer` reads the assignee,
 the snooze and the links (and the default list hides snoozed
 conversations from it too), but changes nothing and keeps no read
 marker. An `external` participant sees none of it on any surface: no
-field in `conversation get`, no event, no filter (asking for one is
+field in `conversation get`, no workflow event, no filter (asking for one is
 exit 5), and a snoozed conversation is not hidden from it, since it
 cannot see the snooze.
 

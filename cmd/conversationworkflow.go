@@ -25,7 +25,10 @@ const (
 	// of `conversation list`.
 	flagAssignee = "assignee"
 	flagSnoozed  = "snoozed"
-	flagLinked   = "linked"
+	// flagSnoozeEnded keeps the conversations whose snooze has ended and
+	// that the runtime has not yet woken.
+	flagSnoozeEnded = "snooze-ended"
+	flagLinked      = "linked"
 )
 
 // workflowOut is what a workflow change reports: the conversation as it
@@ -201,7 +204,8 @@ hidden from ` + "`conversation list`" + ` (see --snoozed there) and wakes at the
 time, or when a live inbound message is recorded after the snooze, whichever is
 first; history imported from a provider never wakes it. Nothing is
 scheduled: uma works the wake out when it reads the conversation, so a
-snooze survives a daemon restart and waking emits no event. A snooze is
+snooze survives a daemon restart; the daemon's sweep clears an ended snooze
+within a minute and emits conversation.snooze_ended. A snooze is
 independent of the conversation's status and local to uma: nothing changes
 at the provider. Snoozing again replaces the snooze. The output and
 --dry-run show the resolved time; rerunning with --for resolves a later
@@ -477,7 +481,8 @@ changes nothing.`
 Read state is yours alone: another actor's marker is independent, and no
 one reads it. It is local to uma — it sends no receipt to the provider
 (` + "`receipt send`" + ` does that), changes neither the conversation nor its
-revision, and emits no event. ` + "`conversation list --unread`" + ` lists what is unread
+revision, and emits one conversation.read_marked or conversation.unread_marked
+event per actual move, readable by you alone. ` + "`conversation list --unread`" + ` lists what is unread
 for you; ` + "`conversation get`" + ` shows your marker. The call is idempotent: the
 same mark again changes nothing. --dry-run shows your current mark and the
 new one. Desk role.`,
@@ -506,7 +511,7 @@ new one. Desk role.`,
 							args["message"] = p.Message.Ref.ID
 						}
 						w.Plan = &cli.Plan{Args: args, Effects: []cli.Effect{planEffect("update", "read_marker:"+string(cv.Ref.ID), true, fmt.Sprintf(
-							"your read marker: %s -> %s; yours alone, local to uma (no receipt reaches the provider, the conversation's revision does not move, no event)",
+							"your read marker: %s -> %s; yours alone, local to uma (no receipt reaches the provider, the conversation's revision does not move; one event, readable by you alone)",
 							markText(p.Current), next))}, PrerequisitesChecked: []string{"authorization", "conversation", "message", "request"}}
 						return nil
 					}

@@ -235,7 +235,7 @@ lifecycle. Runs in the daemon (exit 70 without one). See
 
 ```sh
 heo conversation list [--inbox I] [--status S,...] [--label L,...] [--label-all L,...]
-                      [--label-none L,...] [--unread] [--assignee A] [--snoozed MODE] [--linked]
+                      [--label-none L,...] [--unread] [--assignee A] [--snoozed MODE] [--snooze-ended[=false]] [--linked]
                       [--work-item[=false]] [--work-item-status open|pending|resolved|closed,...]
                       [--sort last-activity] [--updated-since TIME] [--limit N] [--cursor C]
 heo conversation get <conversation>                 # record ID; shows the revision
@@ -294,7 +294,8 @@ heo conversation triage <conversation> [--send-to-cloud]
   the assignee, snooze and links. See
   [conversations.md](conversations.md#assign-snooze-link-and-read).
 - **list** workflow filters: `--unread`, `--assignee ACTOR|self|none`,
-  `--snoozed include|only|exclude` (default `exclude`) and `--linked`,
+  `--snoozed include|only|exclude` (default `exclude`), `--snooze-ended[=false]`
+  (snooze over, not yet woken by the sweep) and `--linked`,
   applied by uma and combined by AND.
 - **list** label filters: `--label` any of, `--label-all` all of,
   `--label-none` none of; combined by AND, applied by uma. An unknown

@@ -117,7 +117,12 @@ Snoozed conversations (` + "`conversation snooze`" + `) are left out by default:
 them, --snoozed=exclude is the default. The other workflow filters are
 --unread (conversations holding a message unread for you), --assignee
 (an actor ID, self for you, or none for the unassigned) and --linked
-(conversations that hold a link you may read). They combine with every filter above by AND, and uma applies
+(conversations that hold a link you may read). --snooze-ended keeps the
+conversations whose snooze has ended (its time passed, or a live inbound
+message arrived) and that the runtime has not yet woken: such a
+conversation is transient, since the runtime's sweep clears the snooze
+and emits conversation.snooze_ended within a minute; --snooze-ended=false
+keeps the others. They combine with every filter above by AND, and uma applies
 them, so pages are full. They need the right to read workflow state,
 which desk and viewer hold: an external actor asking for one is refused
 (exit 5), and sees every conversation it may read, snoozed or not.
@@ -150,6 +155,7 @@ Marking a conversation unread moves the marker, so it counts as a change.`,
   heo conversation list --label-all billing,urgent
   heo conversation list --unread --assignee self
   heo conversation list --snoozed only
+  heo conversation list --snooze-ended
   heo conversation list --assignee none --linked
   heo conversation list --work-item --work-item-status open,pending
   heo conversation list --inbox issues --work-item-status closed
@@ -207,6 +213,7 @@ Marking a conversation unread moves the marker, so it counts as a change.`,
 	c.Flags().Bool(flagUnread, false, "Only conversations holding a message unread for you")
 	c.Flags().String(flagAssignee, "", "Only conversations assigned to this actor (such as uid:1001), to self, or to none")
 	c.Flags().String(flagSnoozed, "", "Snoozed conversations: "+strings.Join(desk.SnoozeModes(), ", ")+" (default exclude: snoozed ones are left out)")
+	c.Flags().Bool(flagSnoozeEnded, false, "Only conversations whose snooze has ended and the runtime has not yet woken (they are cleared within one sweep); =false only the others")
 	c.Flags().Bool(flagLinked, false, "Only conversations that hold a link you may read")
 	c.Flags().Bool(flagWorkItem, false, "Only conversations that have a work item (an issue or a ticket); =false only those that have none")
 	c.Flags().StringSlice(flagWorkItemStatus, nil, "Only conversations whose work item is in these statuses: "+strings.Join(desk.WorkItemStatuses(), ", "))
