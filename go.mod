@@ -23,7 +23,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	hop.top/cite v0.1.1
 	hop.top/kit v0.5.0-beta.14
-	hop.top/uma v0.1.0-alpha.0
+	hop.top/uma v0.1.0-alpha.1
 	hop.top/uma/adapter/chat/discord v0.1.0-alpha.0
 	hop.top/uma/adapter/chat/slack v0.1.0-alpha.0
 	hop.top/uma/adapter/chat/teams v0.1.0-alpha.0
