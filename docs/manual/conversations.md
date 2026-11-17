@@ -63,6 +63,9 @@ the search filters ([Search messages](#search-messages)). `conversation
 list` filters by `--inbox`, `--status` and labels ([Labels](#labels)).
 `--format json` returns uma's records as they are.
 
+For a cross-inbox attention or activity feed, see [desk-feeds.md](desk-feeds.md): what
+these listings and the event log give a desk client, and what is missing.
+
 ## Search messages
 
 Search is `message list` with more filters; there is no separate command.

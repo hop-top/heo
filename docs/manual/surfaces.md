@@ -211,6 +211,8 @@ MCP refuse them. So does `event watch`, which streams until stopped: it
 is not offered on REST, gRPC or MCP, where it would hold the daemon (see
 [deliveries-and-events.md](deliveries-and-events.md#terminal-only)).
 
+For what a desk client can build from these reads, see [desk-feeds.md](desk-feeds.md).
+
 ## Another authenticator
 
 To authenticate with your own identity provider instead of the surface
