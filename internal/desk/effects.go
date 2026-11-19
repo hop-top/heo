@@ -90,6 +90,10 @@ type MailTag struct {
 	// Set is the whole list of Outlook category names; an empty list
 	// clears them. Nil when not asked.
 	Set *[]string
+	// Message is the record ID of the conversation's message the change
+	// acts on. Empty: the message the conversation's reply route names,
+	// the first one the conversation held.
+	Message string
 }
 
 // Effect is the extension effect the change runs: Outlook's categories
@@ -139,17 +143,20 @@ type TagPlan struct {
 	// Resolved are the provider mailbox names of --add and --remove the
 	// plan turned into the label IDs it sends; Tag holds the IDs.
 	Resolved []Resolved
-	// Message is the provider message the change acts on: the one the
-	// conversation's reply route names, the latest the peer wrote.
+	// Message is the provider message the change acts on: the one named
+	// with Tag.Message, else the one the conversation's reply route
+	// names, which is the first message the conversation held.
 	Message string
 	// Declaration is set by a preview only.
 	Declaration *EffectDeclaration
 }
 
-// PlanTag builds and checks the change of the tags on the message
-// conversation id replies to, under operation op. It writes nothing. A
-// conversation whose reply route names no provider message has nothing
-// to tag (model.Conflict). The channel's adapter must declare
+// PlanTag builds and checks the change of the tags on a message of
+// conversation id: the one t.Message names (a message of the conversation
+// the provider holds, else model.Validation), by default the message its
+// reply route names, the first the conversation held. It writes nothing.
+// A conversation whose reply route names no provider message has nothing
+// to tag by default (model.Conflict). The channel's adapter must declare
 // extension_execute and ship the effect the change runs (Gmail's labels
 // for --add and --remove, Outlook's categories for --set), in a
 // preview and on submission; the other one is refused with a pointer to
@@ -176,9 +183,9 @@ func (s Service) PlanTag(ctx context.Context, id string, t MailTag, op model.Ope
 	if err != nil {
 		return TagPlan{}, err
 	}
-	if conv.ReplyRoute.ParentID == "" {
-		return TagPlan{}, model.NewError(model.Conflict, fmt.Sprintf(
-			"conversation %s: its reply route names no provider message to tag; the peer has written none", id))
+	parent, target, err := s.effectMessage(ctx, conv, t.Message, "tag")
+	if err != nil {
+		return TagPlan{}, err
 	}
 	var resolved []Resolved
 	if t.Set == nil {
@@ -198,12 +205,12 @@ func (s Service) PlanTag(ctx context.Context, id string, t MailTag, op model.Ope
 	}
 	req := model.ExecuteExtension{
 		Command: model.Command{Call: call(), Operation: op}, Target: conv.Ref.Ref(), Audience: effectAudience,
-		Action: model.Extension{Name: t.Effect(), Version: effectVersion(t), Data: data},
+		Action: model.Extension{Name: t.Effect(), Version: effectVersion(t), Data: data}, Message: target,
 	}
 	if err := req.Validate(); err != nil {
 		return TagPlan{}, err
 	}
-	p := TagPlan{Request: req, Conversation: conv, Tag: t, Resolved: resolved, Message: conv.ReplyRoute.ParentID}
+	p := TagPlan{Request: req, Conversation: conv, Tag: t, Resolved: resolved, Message: parent}
 	if mode == channels.Preview {
 		p.Declaration = &d
 		if err := s.validateAction(ctx, in.Channel, req.Audience, req.Action); err != nil {
@@ -251,4 +258,25 @@ func (s Service) TagConversation(ctx context.Context, p TagPlan) (model.Conversa
 	}
 	c, err := s.Client.Conversations().Get(ctx, model.Lookup[model.ConversationRef]{Call: call(), Ref: p.Conversation.Ref})
 	return c, acc, err
+}
+
+// effectMessage resolves the message a per-message mail effect (verb names
+// it, for the refusal) acts on: record names one of the conversation's
+// provider messages, else the one its reply route names. It returns the
+// provider message ID and, when a record was named, the uma message the
+// request carries. A conversation whose route names none, with no record
+// named, has nothing to act on (model.Conflict).
+func (s Service) effectMessage(ctx context.Context, conv model.Conversation, record, verb string) (string, *model.MessageRef, error) {
+	if record == "" {
+		if conv.ReplyRoute.ParentID == "" {
+			return "", nil, model.NewError(model.Conflict, fmt.Sprintf(
+				"conversation %s: its reply route names no provider message to %s; the peer has written none", conv.Ref.ID, verb))
+		}
+		return conv.ReplyRoute.ParentID, nil, nil
+	}
+	items, err := s.TargetMessages(ctx, conv, []string{record})
+	if err != nil {
+		return "", nil, err
+	}
+	return items[0].Provider, &model.MessageRef{Conversation: conv.Ref, ID: model.ID(record)}, nil
 }

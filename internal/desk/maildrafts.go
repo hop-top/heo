@@ -234,7 +234,8 @@ type UnsubscribePlan struct {
 }
 
 // PlanUnsubscribe builds and checks the unsubscribe from the sender of
-// the message conversation id replies to, under operation op. It writes
+// the message conversation id replies to (its first message), under
+// operation op. It writes
 // nothing, and neither reads nor sends a URL: the adapter reads the
 // message's headers again from the provider when the effect runs, and
 // follows only what they permit (an RFC 8058 one-click POST, or a mailto
@@ -243,6 +244,14 @@ type UnsubscribePlan struct {
 // (model.Conflict). The channel's adapter must declare extension_execute
 // and ship its unsubscribe effect, in a preview and on submission.
 func (s Service) PlanUnsubscribe(ctx context.Context, id, method string, op model.OperationID, mode channels.Mode) (UnsubscribePlan, error) {
+	return s.PlanUnsubscribeMessage(ctx, id, method, "", op, mode)
+}
+
+// PlanUnsubscribeMessage is PlanUnsubscribe for the message of the
+// conversation named by its record ID message (a message of the
+// conversation the provider holds, else model.Validation); empty is the
+// message its reply route names, the first the conversation held.
+func (s Service) PlanUnsubscribeMessage(ctx context.Context, id, method, message string, op model.OperationID, mode channels.Mode) (UnsubscribePlan, error) {
 	if err := CheckUnsubscribeMethod(method); err != nil {
 		return UnsubscribePlan{}, err
 	}
@@ -266,9 +275,9 @@ func (s Service) PlanUnsubscribe(ctx context.Context, id, method string, op mode
 	if err != nil {
 		return UnsubscribePlan{}, err
 	}
-	if conv.ReplyRoute.ParentID == "" {
-		return UnsubscribePlan{}, model.NewError(model.Conflict, fmt.Sprintf(
-			"conversation %s: its reply route names no provider message to unsubscribe from; the sender has written none", id))
+	parent, target, err := s.effectMessage(ctx, conv, message, "unsubscribe from")
+	if err != nil {
+		return UnsubscribePlan{}, err
 	}
 	data, err := json.Marshal(map[string]string{"method": method})
 	if err != nil {
@@ -276,12 +285,12 @@ func (s Service) PlanUnsubscribe(ctx context.Context, id, method string, op mode
 	}
 	req := model.ExecuteExtension{
 		Command: model.Command{Call: call(), Operation: op}, Target: conv.Ref.Ref(), Audience: effectAudience,
-		Action: model.Extension{Name: name, Version: version, Data: data},
+		Action: model.Extension{Name: name, Version: version, Data: data}, Message: target,
 	}
 	if err := req.Validate(); err != nil {
 		return UnsubscribePlan{}, err
 	}
-	p := UnsubscribePlan{Request: req, Conversation: conv, Method: method, Message: conv.ReplyRoute.ParentID}
+	p := UnsubscribePlan{Request: req, Conversation: conv, Method: method, Message: parent}
 	if mode == channels.Preview {
 		p.Declaration = &eff
 		if err := s.validateAction(ctx, in.Channel, req.Audience, req.Action); err != nil {

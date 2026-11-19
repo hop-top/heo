@@ -33,6 +33,17 @@ type conversationTagOut struct {
 	Notes        []string           `json:"notes,omitempty"  yaml:"notes,omitempty"`
 }
 
+// singleMessageOf reads the one --message of a per-message mail verb: empty
+// when not given, a usage error when given empty, which would otherwise
+// read as the default target.
+func singleMessageOf(cmd *cobra.Command) (string, error) {
+	m, _ := cmd.Flags().GetString(flagMessage)
+	if m == "" && cmd.Flags().Changed(flagMessage) {
+		return "", output.UsageError("--message: a message record ID is required")
+	}
+	return m, nil
+}
+
 // mailTagOf reads the change the leaf was given: --set only when named,
 // an empty value naming an empty list.
 func mailTagOf(cmd *cobra.Command) desk.MailTag {
@@ -43,6 +54,7 @@ func mailTagOf(cmd *cobra.Command) desk.MailTag {
 		v, _ := cmd.Flags().GetStringSlice(flagSet)
 		t.Set = &v
 	}
+	t.Message, _ = cmd.Flags().GetString(flagMessage)
 	return t
 }
 
@@ -107,9 +119,12 @@ func (a *app) conversationTagCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "tag <conversation>",
 		Short: "Change the mailbox's own tags on a mail conversation's message",
-		Long: `Change the tags the mail provider keeps on the message the mail
-conversation <conversation> (record ID) replies to, the latest the
-peer wrote: Gmail's labels, by label ID or name, with --add and --remove
+		Long: `Change the tags the mail provider keeps on one message of the mail
+conversation <conversation> (record ID): the message --message names (a
+message of the conversation, by record ID; ` + "`message list --conversation`" + ` lists them;
+anything else is a usage error, exit 2), by default the message the
+conversation's reply route names, which is the first message the
+conversation held, not the latest. Gmail's labels, by label ID or name, with --add and --remove
 (repeat or comma-separate; IDs such as Label_12, STARRED or INBOX, or a
 name such as Clients/Acme), or
 Outlook's categories, by name, with --set, which replaces the whole list
@@ -143,16 +158,20 @@ before anything is written; an adapter that ships the other effect
 says which flags it takes. --dry-run also asks the adapter, offline, to
 check the fields (VALIDATION, exit 2), and prints the exact change and
 where it goes; it writes and sends nothing. A conversation the peer has
-written no message in has nothing to tag (CONFLICT, exit 4). Committed
+written no message in has nothing to tag by default (CONFLICT, exit 4). Committed
 under --idempotency-key: rerunning with the same key and arguments
 returns the same operation (replayed); without one, heo mints a key and
 prints it. Desk role.`,
 		Example: `  heo conversation tag conv_123 --add Label_12,STARRED --remove INBOX --dry-run
+  heo conversation tag conv_123 --message msg_456 --remove INBOX
   heo conversation tag conv_123 --set Billing,Urgent
   heo conversation tag conv_123 --set= --idempotency-key untag-123`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			t := mailTagOf(cmd)
+			if _, err := singleMessageOf(cmd); err != nil {
+				return err
+			}
 			if err := desk.CheckMailTag(t); err != nil {
 				return output.UsageError(strings.TrimPrefix(err.Error(), "validation: "))
 			}
@@ -197,6 +216,7 @@ prints it. Desk role.`,
 	}
 	c.Flags().StringSlice(flagAdd, nil, "Gmail labels to add, by ID or name (repeat or comma-separate)")
 	c.Flags().StringSlice(flagRemove, nil, "Gmail labels to remove, by ID or name (repeat or comma-separate)")
+	c.Flags().String(flagMessage, "", "Message of the conversation to tag (record ID); default: the message its reply route names, the first the conversation held")
 	c.Flags().StringSlice(flagSet, nil, "Outlook category names that replace the whole list; empty clears it (repeat or comma-separate)")
 	c.MarkFlagsOneRequired(flagAdd, flagRemove, flagSet)
 	c.MarkFlagsMutuallyExclusive(flagAdd, flagSet)

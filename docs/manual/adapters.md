@@ -425,7 +425,7 @@ with authentication enabled, endpoint
 service account `push_service_account`.
 
 Verb: `conversation tag --add|--remove` changes Gmail labels, by label ID, on
-the message a conversation replies to ([conversations.md](conversations.md#tag-a-mail-message-at-the-provider)).
+one message of a conversation, by default the one its reply route names ([conversations.md](conversations.md#tag-a-mail-message-at-the-provider)).
 It needs the Gmail modify scope on the token. `provider-label list` reads the account's labels
 (`users.labels.list`) and `provider-label create` makes one, and a label name given to `conversation tag`
 or `conversation move` is resolved through that list ([conversations.md](conversations.md#list-and-create-provider-mailboxes)).
@@ -492,8 +492,8 @@ imported once. File attachments are downloaded with the message, one
 request each, at most 10 a message; a throttled download stops the call
 with the cursor of that page.
 
-Verb: `conversation tag --set` replaces the Outlook categories of the message a
-conversation replies to ([conversations.md](conversations.md#tag-a-mail-message-at-the-provider)).
+Verb: `conversation tag --set` replaces the Outlook categories of one message of a
+conversation, by default the one its reply route names ([conversations.md](conversations.md#tag-a-mail-message-at-the-provider)).
 It needs `Mail.ReadWrite` on the mailbox; the names are the mailbox's master
 category names. `message reply` with `--reply-all` replies to all through
 Graph's reply-all, and `--cc` and `--bcc` become the message's cc and bcc

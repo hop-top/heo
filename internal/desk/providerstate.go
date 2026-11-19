@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"hop.top/heo/internal/channels"
+	"hop.top/uma/adapter/mail/google"
 	"hop.top/uma/model"
 )
 
@@ -28,6 +29,10 @@ type StateChange struct {
 	Destination model.MoveDestination
 	// Add and Remove are a move's provider label IDs.
 	Add, Remove []string
+	// Messages are the record IDs of the conversation's messages the
+	// change is limited to; empty is every message of the conversation
+	// (and, on Gmail, of their threads).
+	Messages []string
 }
 
 // StateVerbs are the state verbs, in documentation order.
@@ -72,6 +77,14 @@ func CheckStateChange(c StateChange) error {
 
 // Asked says what the change asks, for a plan and a row.
 func (c StateChange) Asked() string {
+	asked := c.asked()
+	if len(c.Messages) > 0 {
+		asked += " on message " + strings.Join(c.Messages, ", ")
+	}
+	return asked
+}
+
+func (c StateChange) asked() string {
 	switch c.Verb {
 	case model.StateVerbFlag, model.StateVerbUnflag:
 		return string(c.Verb) + " " + c.Kind
@@ -146,6 +159,15 @@ type StatePlan struct {
 	Resolved []Resolved
 	// Declaration is set by a preview only.
 	Declaration *Declaration
+	// Items are the provider messages the change acts on: the ones named
+	// with --message, or every provider message of the conversation as
+	// of now. Set by a preview, and whenever messages are named.
+	Items []MessageItem
+	// ThreadWide is set by a preview of a change that names no message
+	// on a channel whose provider changes whole threads (Gmail): it
+	// reaches every message of the provider threads of the items, those
+	// of other senders and the account's own sent mail included.
+	ThreadWide bool
 	// Limits and Scope are what the channel reported of the verb now,
 	// read by a preview and by a plugin actor's hold. Limits is nil when
 	// nothing was read.
@@ -160,18 +182,22 @@ type StatePlan struct {
 // request builds the uma request of the change.
 func (p StatePlan) request() (any, error) {
 	ref, c := p.Conversation.Ref, p.Change
+	var msgs []model.ID
+	for _, m := range c.Messages {
+		msgs = append(msgs, model.ID(m))
+	}
 	var req interface{ Validate() error }
 	switch c.Verb {
 	case model.StateVerbArchive, model.StateVerbUnarchive:
-		req = model.ArchiveConversation{Command: p.Command, Conversation: ref, Undo: c.Verb == model.StateVerbUnarchive}
+		req = model.ArchiveConversation{Command: p.Command, Conversation: ref, Undo: c.Verb == model.StateVerbUnarchive, Messages: msgs}
 	case model.StateVerbMove:
-		req = model.MoveConversation{Command: p.Command, Conversation: ref, Destination: c.Destination, Add: c.Add, Remove: c.Remove}
+		req = model.MoveConversation{Command: p.Command, Conversation: ref, Destination: c.Destination, Add: c.Add, Remove: c.Remove, Messages: msgs}
 	case model.StateVerbRead, model.StateVerbUnread:
-		req = model.SetConversationRead{Command: p.Command, Conversation: ref, Read: c.Verb == model.StateVerbRead}
+		req = model.SetConversationRead{Command: p.Command, Conversation: ref, Read: c.Verb == model.StateVerbRead, Messages: msgs}
 	case model.StateVerbFlag, model.StateVerbUnflag:
-		req = model.FlagConversation{Command: p.Command, Conversation: ref, Kind: c.Kind, Undo: c.Verb == model.StateVerbUnflag}
+		req = model.FlagConversation{Command: p.Command, Conversation: ref, Kind: c.Kind, Undo: c.Verb == model.StateVerbUnflag, Messages: msgs}
 	case model.StateVerbTrash, model.StateVerbUntrash:
-		req = model.TrashConversation{Command: p.Command, Conversation: ref, Undo: c.Verb == model.StateVerbUntrash}
+		req = model.TrashConversation{Command: p.Command, Conversation: ref, Undo: c.Verb == model.StateVerbUntrash, Messages: msgs}
 	default:
 		return nil, model.NewError(model.Validation, fmt.Sprintf("verb %q: not a provider state verb", c.Verb))
 	}
@@ -231,6 +257,18 @@ func (s Service) PlanState(ctx context.Context, id string, ch StateChange, rev m
 	if err != nil {
 		return StatePlan{}, err
 	}
+	ch.Messages = uniqueStrings(ch.Messages)
+	var items []MessageItem
+	switch {
+	case len(ch.Messages) > 0:
+		if items, err = s.TargetMessages(ctx, conv, ch.Messages); err != nil {
+			return StatePlan{}, err
+		}
+	case mode == channels.Preview:
+		if items, err = s.providerItems(ctx, conv); err != nil {
+			return StatePlan{}, err
+		}
+	}
 	var resolved []Resolved
 	if ch.Verb == model.StateVerbMove {
 		if ch, resolved, err = s.resolveMove(ctx, in, ch); err != nil {
@@ -240,6 +278,7 @@ func (s Service) PlanState(ctx context.Context, id string, ch StateChange, rev m
 	p := StatePlan{
 		Command: model.Command{Call: call(), Operation: op, ExpectedRevision: rev},
 		Change:  ch, Resolved: resolved, Conversation: conv, Action: model.ActionConversationStateAccount,
+		Items: items,
 	}
 	if rev != "" {
 		if p.deferred, err = channels.CheckRevision("conversation", id, conv.Revision, rev, mode); err != nil {
@@ -251,6 +290,7 @@ func (s Service) PlanState(ctx context.Context, id string, ch StateChange, rev m
 	}
 	if mode == channels.Preview {
 		p.Declaration = &decl
+		p.ThreadWide = len(ch.Messages) == 0 && decl.Adapter == google.Type
 	}
 	if mode == channels.Preview || s.Holding() {
 		l, err := s.stateLimits(ctx, conv, ch, capability)

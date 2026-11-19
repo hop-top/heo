@@ -77,9 +77,13 @@ func (a *app) conversationUnsubscribeCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "unsubscribe <conversation>",
 		Short: "Unsubscribe the mailbox from the sender of a mail conversation's message",
-		Long: `Ask the sender of the message the mail conversation <conversation>
-(record ID) replies to, the latest the peer wrote, to stop mailing this
-mailbox, by what the message's own List-Unsubscribe headers allow:
+		Long: `Ask the sender of one message of the mail conversation <conversation>
+(record ID) to stop mailing this mailbox: the message --message names (a
+message of the conversation, by record ID; ` + "`message list --conversation`" + ` lists
+them; anything else is a usage error, exit 2), by default the message the
+conversation's reply route names, which is the first message the
+conversation held, not the latest. It acts on that message's own
+List-Unsubscribe headers, by what the message's own List-Unsubscribe headers allow:
 
   auto (default)   one-click when the message qualifies, else mailto
   one_click        RFC 8058 one-click only
@@ -113,16 +117,21 @@ unsubscribe effect can do this (google.mail, microsoft.mail); --dry-run
 refuses any other, exit 2 (UNSUPPORTED), as does the real run, before
 anything is written. --dry-run also asks the adapter, offline, to check
 the method (VALIDATION, exit 2). A conversation the peer has written no
-message in has nothing to unsubscribe from (CONFLICT, exit 4). Committed
+message in has nothing to unsubscribe from by default (CONFLICT, exit 4). Committed
 under --idempotency-key: rerunning with the same key and arguments
 returns the same operation (replayed) and asks the sender once; without
 one, heo mints a key and prints it. Desk role.`,
 		Example: `  heo conversation unsubscribe conv_123 --dry-run
   heo conversation unsubscribe conv_123 --idempotency-key unsub-123
+  heo conversation unsubscribe conv_123 --message msg_456 --dry-run
   heo conversation unsubscribe conv_123 --method mailto`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			method, _ := cmd.Flags().GetString(flagMethod)
+			message, err := singleMessageOf(cmd)
+			if err != nil {
+				return err
+			}
 			if err := desk.CheckUnsubscribeMethod(method); err != nil {
 				return output.UsageError("--" + strings.TrimPrefix(err.Error(), "validation: "))
 			}
@@ -133,7 +142,7 @@ one, heo mints a key and prints it. Desk role.`,
 			res, err := daemonRun(a, cmd, args, func(ctx context.Context, c control.Caller) (written[conversationUnsubscribeOut], error) {
 				var w written[conversationUnsubscribeOut]
 				err := a.deskHeld(ctx, c, model.ActionExtensionExecute, internalAudience, func(s desk.Service) error {
-					p, err := s.PlanUnsubscribe(ctx, args[0], method, opID(key), planMode(cmd))
+					p, err := s.PlanUnsubscribeMessage(ctx, args[0], method, message, opID(key), planMode(cmd))
 					if err != nil {
 						return err
 					}
@@ -166,6 +175,7 @@ one, heo mints a key and prints it. Desk role.`,
 		},
 	}
 	c.Flags().String(flagMethod, "", "Method the adapter may use: auto (default), one_click or mailto")
+	c.Flags().String(flagMessage, "", "Message of the conversation to unsubscribe from (record ID); default: the message its reply route names, the first the conversation held")
 	providerDependent(c, model.CapabilityExtensionExecute)
 	daemonCommand(c)
 	cli.SetSideEffect(c, cli.SideEffectWriteShared)
