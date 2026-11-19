@@ -139,3 +139,91 @@ func TestStateVerbsHoldThroughDeskHeld(t *testing.T) {
 		t.Error("the provider state verbs do not run through deskHeld and offer their write to the hold point")
 	}
 }
+
+// TestStateVerbsTakeRepeatableMessages: every provider state verb takes
+// --message, repeatable, into the change; an empty one is a usage error.
+func TestStateVerbsTakeRepeatableMessages(t *testing.T) {
+	for _, v := range desk.StateVerbs {
+		c := find(newApp().r.Cmd, "conversation "+string(v))
+		args := []string{"--message", "msg_1", "--message", "msg_2"}
+		switch v {
+		case model.StateVerbMove:
+			args = append(args, "--role", "junk")
+		}
+		if err := c.ParseFlags(args); err != nil {
+			t.Fatalf("%s: %v", v, err)
+		}
+		ch, err := stateChangeOf(c, v)
+		if err != nil || strings.Join(ch.Messages, ",") != "msg_1,msg_2" || !strings.Contains(ch.Asked(), "on message msg_1, msg_2") {
+			t.Errorf("%s: change = %+v, %v; want both messages", v, ch, err)
+		}
+		c = find(newApp().r.Cmd, "conversation "+string(v))
+		if err := c.ParseFlags(append(args, "--message", "")); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := stateChangeOf(c, v); err == nil {
+			t.Errorf("%s: an empty --message was accepted", v)
+		}
+		// Alone, an empty value reads back as no value: it must not widen the change.
+		c = find(newApp().r.Cmd, "conversation "+string(v))
+		if err := c.ParseFlags(append([]string{"--message", ""}, args[4:]...)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := stateChangeOf(c, v); err == nil {
+			t.Errorf("%s: a lone empty --message was accepted as the whole conversation", v)
+		}
+	}
+}
+
+// TestConversationStatePlanListsItems: a preview lists the messages the
+// change resolves to, and says a Gmail change without --message is
+// thread-wide.
+func TestConversationStatePlanListsItems(t *testing.T) {
+	conv := testTagConversation()
+	items := []desk.MessageItem{{Message: "msg_1", Provider: "gm1"}, {Message: "msg_2", Provider: "gm2"}}
+	p := conversationStatePlan(desk.StatePlan{
+		Change: desk.StateChange{Verb: model.StateVerbArchive}, Conversation: conv, Items: items, ThreadWide: true,
+	}, "")
+	d := p.Effects[0].Detail
+	if got, ok := p.Args["items"].([]desk.MessageItem); !ok || len(got) != 2 || p.Args["thread_wide"] != true ||
+		!strings.Contains(d, "all 2 provider message") || !strings.Contains(d, "thread-wide") {
+		t.Errorf("unscoped plan: args = %v, detail = %s", p.Args, d)
+	}
+	p = conversationStatePlan(desk.StatePlan{
+		Change: desk.StateChange{Verb: model.StateVerbArchive, Messages: []string{"msg_2"}}, Conversation: conv, Items: items[1:],
+	}, "")
+	d = p.Effects[0].Detail
+	if _, ok := p.Args["thread_wide"]; ok || !strings.Contains(d, "limited to the 1 message(s) named with --message") || strings.Contains(d, "thread-wide") {
+		t.Errorf("targeted plan: args = %v, detail = %s", p.Args, d)
+	}
+}
+
+// TestTagAndUnsubscribeTakeAMessage: both take one --message, and their
+// help says the default target is the first message, not the latest.
+func TestTagAndUnsubscribeTakeAMessage(t *testing.T) {
+	for _, path := range []string{"conversation tag", "conversation unsubscribe"} {
+		c := find(newApp().r.Cmd, path)
+		if f := c.Flags().Lookup(flagMessage); f == nil || !strings.Contains(f.Usage, "first") {
+			t.Errorf("%s --message = %+v, want a flag naming the default as the first message", path, f)
+		}
+		if strings.Contains(c.Long, "the latest the peer wrote") || !strings.Contains(c.Long, "first message") {
+			t.Errorf("%s help does not state the default target truthfully:\n%s", path, c.Long)
+		}
+	}
+	c := find(newApp().r.Cmd, "conversation tag")
+	if err := c.ParseFlags([]string{"--add", "X", "--message", "msg_9"}); err != nil {
+		t.Fatal(err)
+	}
+	if got := mailTagOf(c); got.Message != "msg_9" {
+		t.Errorf("tag message = %q, want msg_9", got.Message)
+	}
+	for _, path := range []string{"conversation tag", "conversation unsubscribe"} {
+		c := find(newApp().r.Cmd, path)
+		if err := c.ParseFlags([]string{"--message", ""}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := singleMessageOf(c); err == nil {
+			t.Errorf("%s: an empty --message was read as the default target", path)
+		}
+	}
+}

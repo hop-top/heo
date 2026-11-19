@@ -155,6 +155,10 @@ func (i *instance) Execute(_ context.Context, r adapter.ExecuteRequest) (adapter
 	path := i.f.effectFile
 	i.f.mu.Unlock()
 	parent := r.Route.ParentID
+	if r.Target != nil && r.Target.ID != "" {
+		// As the mail adapters do: an effect that names a message acts on it.
+		parent = r.Target.ID
+	}
 	if parent == "" {
 		parent = "-"
 	}

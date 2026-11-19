@@ -40,11 +40,23 @@ type StateChange struct {
 	Kind        string
 	Destination model.MoveDestination
 	Add, Remove []string
+	// Items are the provider message IDs of a targeted change: the
+	// messages the caller named, and no others. Empty when the change
+	// was not targeted, so the whole conversation.
+	Items []string
 }
 
 // detail is the line's tail: the flag kind, the destination or the label
-// changes.
+// changes, then the messages of a targeted change.
 func (c StateChange) detail() string {
+	d := c.change()
+	if len(c.Items) > 0 {
+		d += " items=" + strings.Join(c.Items, ",")
+	}
+	return d
+}
+
+func (c StateChange) change() string {
 	switch {
 	case c.Kind != "":
 		return " kind=" + c.Kind
@@ -112,6 +124,19 @@ func (f *Factory) stateLimits(c model.Capability) (model.Extension, bool) {
 	return l.Extension(), true
 }
 
+// targetedItems are the provider message IDs of items when the request is
+// targeted, nil otherwise.
+func targetedItems(targeted bool, items []model.ExternalRef) []string {
+	if !targeted {
+		return nil
+	}
+	ids := make([]string, 0, len(items))
+	for _, it := range items {
+		ids = append(ids, it.ID)
+	}
+	return ids
+}
+
 func (i *instance) stateEffect(r adapter.Effect, c StateChange) (adapter.Outcome, error) {
 	return i.effect(Effect{Kind: "state", State: c}, &r.Route)
 }
@@ -122,12 +147,12 @@ func (i *instance) Archive(_ context.Context, r adapter.ArchiveRequest) (adapter
 	if r.Undo {
 		v = "unarchive"
 	}
-	return i.stateEffect(r.Effect, StateChange{Verb: v})
+	return i.stateEffect(r.Effect, StateChange{Verb: v, Items: targetedItems(r.Targeted, r.Items)})
 }
 
 // Move applies a move, after DeclareState.
 func (i *instance) Move(_ context.Context, r adapter.MoveRequest) (adapter.Outcome, error) {
-	return i.stateEffect(r.Effect, StateChange{Verb: "move", Destination: r.Destination, Add: r.Add, Remove: r.Remove})
+	return i.stateEffect(r.Effect, StateChange{Verb: "move", Destination: r.Destination, Add: r.Add, Remove: r.Remove, Items: targetedItems(r.Targeted, r.Items)})
 }
 
 // SetReadState marks a conversation read or unread, after DeclareState.
@@ -136,7 +161,7 @@ func (i *instance) SetReadState(_ context.Context, r adapter.ReadStateRequest) (
 	if r.Read {
 		v = "read"
 	}
-	return i.stateEffect(r.Effect, StateChange{Verb: v})
+	return i.stateEffect(r.Effect, StateChange{Verb: v, Items: targetedItems(r.Targeted, r.Items)})
 }
 
 // Flag sets or clears a flag, after DeclareState.
@@ -145,7 +170,7 @@ func (i *instance) Flag(_ context.Context, r adapter.FlagRequest) (adapter.Outco
 	if r.Undo {
 		v = "unflag"
 	}
-	return i.stateEffect(r.Effect, StateChange{Verb: v, Kind: r.Kind})
+	return i.stateEffect(r.Effect, StateChange{Verb: v, Kind: r.Kind, Items: targetedItems(r.Targeted, r.Items)})
 }
 
 // Trash trashes or restores a conversation, after DeclareState.
@@ -154,5 +179,5 @@ func (i *instance) Trash(_ context.Context, r adapter.TrashRequest) (adapter.Out
 	if r.Undo {
 		v = "untrash"
 	}
-	return i.stateEffect(r.Effect, StateChange{Verb: v})
+	return i.stateEffect(r.Effect, StateChange{Verb: v, Items: targetedItems(r.Targeted, r.Items)})
 }

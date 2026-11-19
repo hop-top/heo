@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ type conversationStateOut struct {
 	Verb         string             `json:"verb"             yaml:"verb"`
 	Change       string             `json:"change"           yaml:"change"`
 	Scope        string             `json:"scope,omitempty"  yaml:"scope,omitempty"`
+	Messages     []string           `json:"messages,omitempty" yaml:"messages,omitempty"`
 	Operation    operationView      `json:"operation"        yaml:"operation"`
 	OperationKey string             `json:"operation_key"    yaml:"operation_key"`
 	Notes        []string           `json:"notes,omitempty"  yaml:"notes,omitempty"`
@@ -150,6 +152,21 @@ func conversationStatePlan(p desk.StatePlan, key string) *cli.Plan {
 	checked := declarationArgs(args, p.Declaration)
 	detail := fmt.Sprintf("external: the provider's own state of conversation %s (%s); the provider shows it in its own clients, uma records it once applied",
 		cur.Ref.ID, p.Change.Asked())
+	if len(p.Change.Messages) > 0 {
+		args["messages"] = p.Change.Messages
+	}
+	if p.Items != nil || len(p.Change.Messages) > 0 {
+		args["items"] = p.Items
+		if len(p.Change.Messages) > 0 {
+			detail += fmt.Sprintf("; limited to the %d message(s) named with --message, the rest of the conversation is left alone", len(p.Items))
+		} else {
+			detail += fmt.Sprintf("; no --message: acts on all %d provider message(s) of the conversation, as they are when the change runs", len(p.Items))
+		}
+	}
+	if p.ThreadWide {
+		args["thread_wide"] = true
+		detail += "; thread-wide: this provider changes whole threads, so every message of each provider thread of those messages changes too, other senders' replies and the account's own sent mail included; --message limits it to the named messages"
+	}
 	if l := p.Limits; l != nil {
 		args["scope"] = string(l.Scope)
 		args["limits"] = l
@@ -170,6 +187,9 @@ func conversationStateRows(o conversationStateOut) [][2]string {
 	if o.Scope != "" {
 		rows = append(rows, [2]string{"scope", o.Scope})
 	}
+	if len(o.Messages) > 0 {
+		rows = append(rows, [2]string{"messages", strings.Join(o.Messages, ", ")})
+	}
 	return append(rows, operationRows(o.Operation, o.OperationKey)...)
 }
 
@@ -186,6 +206,12 @@ func resolvedLines(rs []desk.Resolved) string {
 // stateChangeOf reads the change the leaf was given.
 func stateChangeOf(cmd *cobra.Command, v model.StateVerb) (desk.StateChange, error) {
 	ch := desk.StateChange{Verb: v}
+	ch.Messages, _ = cmd.Flags().GetStringArray(flagMessage)
+	// An empty value reads back as no value (pflag), which would widen the
+	// change to the whole conversation: refuse it when the flag was given.
+	if cmd.Flags().Changed(flagMessage) && (len(ch.Messages) == 0 || slices.Contains(ch.Messages, "")) {
+		return ch, output.UsageError("--message: a message record ID is required")
+	}
 	switch v {
 	case model.StateVerbFlag, model.StateVerbUnflag:
 		ch.Kind, _ = cmd.Flags().GetString(flagKind)
@@ -219,6 +245,18 @@ provider applied the change. The change is queued as a uma operation: the
 command returns once uma accepted it durably, never applied. The daemon's
 workers send it, and ` + "`delivery get <operation>`" + ` follows it. A change the provider
 reports itself, in its own client, reaches uma the same way.
+
+By default the change acts on the whole conversation: every message of it
+the provider holds, as they are when the worker runs the change (a message
+that arrives in between is included). On a lock-to-single inbox that is all
+the mail from one sender, and on Gmail the change also reaches every
+message of each Gmail thread those messages belong to (other senders' replies
+and the account's own sent mail included). --message <message> (record ID;
+repeat for several) limits it to exactly those messages: each must be a
+message of this conversation the provider holds (` + "`message list --conversation`" + `),
+else usage error, exit 2, and nothing is applied. The set is fixed when the
+change is queued, and no thread is widened to. --dry-run lists the messages
+the change resolves to and, without --message on Gmail, says it is thread-wide.
 
 Only a channel whose adapter declares ` + string(stateCapability(v)) + ` can do this (` + "`heo channel get`" + `
 lists them): --dry-run refuses any other, exit 2 (UNSUPPORTED), as does the
@@ -268,7 +306,7 @@ guide lists (` + "`operation held`" + `). Desk role.`,
 						return err
 					}
 					w.Out = conversationStateOut{Conversation: conv, Verb: string(v), Change: p.Change.Asked(),
-						Operation: operationOf(acc), OperationKey: key}
+						Messages: p.Change.Messages, Operation: operationOf(acc), OperationKey: key}
 					if p.Limits != nil {
 						w.Out.Scope = string(p.Limits.Scope)
 					}
@@ -295,6 +333,7 @@ guide lists (` + "`operation held`" + `). Desk role.`,
 		c.MarkFlagsMutuallyExclusive(flagTo, flagRole)
 		c.MarkFlagsOneRequired(flagTo, flagRole, flagAdd, flagRemove)
 	}
+	c.Flags().StringArray(flagMessage, nil, "Limit the change to this message of the conversation (record ID; repeatable); default: the whole conversation")
 	addOptionalRevisionFlag(c)
 	providerDependent(c, stateCapability(v))
 	daemonCommand(c)

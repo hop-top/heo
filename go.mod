@@ -23,24 +23,24 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	hop.top/cite v0.1.1
 	hop.top/kit v0.5.0-beta.14
-	hop.top/uma v0.1.0-alpha.1.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/chat/discord v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/chat/slack v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/chat/teams v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/chat/telegram v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/mail v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/mail/google v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/mail/microsoft v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/messaging/meta v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/messaging/twilio v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/ticket/github v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/ticket/gitlab v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/ticket/jira v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/ticket/linear v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/adapter/ticket/zendesk v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/contrib/kit v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/store/postgres v0.1.0-alpha.0.0.20261117172510-84c6de94d299
-	hop.top/uma/testing/xrrtest v0.1.0-alpha.0.0.20261117172510-84c6de94d299
+	hop.top/uma v0.1.0-alpha.1.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/chat/discord v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/chat/slack v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/chat/teams v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/chat/telegram v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/mail v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/mail/google v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/mail/microsoft v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/messaging/meta v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/messaging/twilio v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/ticket/github v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/ticket/gitlab v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/ticket/jira v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/ticket/linear v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/adapter/ticket/zendesk v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/contrib/kit v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/store/postgres v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
+	hop.top/uma/testing/xrrtest v0.1.0-alpha.0.0.20261119200829-9c4d733c7ebb
 	hop.top/xrr v0.1.0-alpha.5
 )
 

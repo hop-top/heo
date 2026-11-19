@@ -485,13 +485,16 @@ heo message reply-draft conv_123 --draft r-77 --delete
 
 ### Unsubscribe from a sender
 
-`conversation unsubscribe` asks the sender of the message a mail
-conversation replies to (the latest the peer wrote) to stop mailing the
-mailbox:
+`conversation unsubscribe` asks the sender of one message of a mail
+conversation to stop mailing the mailbox. By default the message is the one
+the conversation's reply route names: the first message the conversation
+held, not the latest. `--message <message>` (a message record ID of the
+conversation; anything else is a usage error, exit 2) names another:
 
 ```sh
 heo conversation unsubscribe conv_123 --dry-run
 heo conversation unsubscribe conv_123 --idempotency-key unsub-123
+heo conversation unsubscribe conv_123 --message msg_456 --dry-run
 heo conversation unsubscribe conv_123 --method mailto
 ```
 
@@ -626,6 +629,7 @@ heo conversation archive conv_123 --idempotency-key arch-123
 heo conversation move conv_123 --role junk          # how a mailbox marks spam
 heo conversation flag conv_123 --kind important
 heo conversation read conv_123
+heo conversation archive conv_123 --message msg_456 --dry-run   # one message only
 ```
 
 - It is the provider's state, not uma's: the conversation's status
@@ -635,6 +639,19 @@ heo conversation read conv_123
   labels, and not the message tags of `conversation tag`. `--to`, `--add`
   and `--remove` take a mailbox by ID or by name, resolved through the
   channel's mailbox list ([below](#list-and-create-provider-mailboxes)).
+- **Scope.** Without `--message` a change acts on the whole conversation:
+  every message of it the provider holds, as they are when the worker runs
+  the change. On a lock-to-single inbox that is all the mail from one
+  sender. Gmail changes whole threads, so the change also reaches every
+  message of each Gmail thread those messages belong to (other senders'
+  replies and the account's own sent mail included). `--message <message>`
+  (a message record ID; repeat it for several) limits the change to
+  exactly those messages: each must be a message of that conversation the
+  provider holds (`message list --conversation` lists them), else a usage
+  error, exit 2, and nothing is applied. The set is fixed when the change is
+  queued. On Gmail a named message is changed on its own, never through its
+  thread. `--dry-run` lists the messages the change resolves to (`items`)
+  and, on Gmail without `--message`, says that it is thread-wide.
 - Queued like a reply: the command returns once uma accepted it durably,
   `delivery get <operation>` follows it, and uma's provider state for the
   conversation (`conversation get`) changes only once the provider applied
@@ -666,6 +683,7 @@ A mailbox keeps tags of its own: Gmail's labels, Outlook's categories.
 ```sh
 heo conversation tag conv_123 --add Label_12,STARRED --remove INBOX --dry-run
 heo conversation tag conv_123 --add Label_12,STARRED --remove INBOX
+heo conversation tag conv_123 --message msg_456 --remove INBOX
 heo conversation tag conv_123 --set Billing,Urgent
 heo conversation tag conv_123 --set= --idempotency-key untag-123
 ```
@@ -690,10 +708,13 @@ heo conversation tag conv_123 --set= --idempotency-key untag-123
   exists is the provider's answer, shown on the operation (`heo delivery
   get`). `--dry-run` prints what each name resolved to. A value may not
   hold a comma.
-- The change acts on **one message**, the one the conversation replies
-  to: the latest the peer wrote. The preview names it (`message`). The
-  rest of the thread is not touched, and a conversation the peer has
-  written no message in has nothing to tag (`CONFLICT`, exit 4).
+- The change acts on **one message**. By default it is the one the
+  conversation's reply route names, which is the first message the
+  conversation held, not the latest; `--message <message>` (a message
+  record ID of the conversation, else a usage error, exit 2) names
+  another. The preview names it (`message`, the provider's ID). The rest of
+  the thread is not touched, and a conversation the peer has written no
+  message in has nothing to tag by default (`CONFLICT`, exit 4).
 
 It is an **external change**: the mailbox shows it in every client. It is
 queued like a reply and **never applied when the command returns**:

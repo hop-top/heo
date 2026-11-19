@@ -335,6 +335,8 @@ heo conversation summarize conv_123 --dry-run
 heo conversation summarize conv_123 --format json
 # Preview with --dry-run, change nothing
 heo conversation tag conv_123 --add Label_12,STARRED --remove INBOX --dry-run
+# With --message, --remove
+heo conversation tag conv_123 --message msg_456 --remove INBOX
 # With --set
 heo conversation tag conv_123 --set Billing,Urgent
 # Safe to retry, with an idempotency key
@@ -373,6 +375,8 @@ heo conversation unsnooze conv_123 --dry-run
 heo conversation unsubscribe conv_123 --dry-run
 # Safe to retry, with an idempotency key
 heo conversation unsubscribe conv_123 --idempotency-key unsub-123
+# Preview with --dry-run, change nothing
+heo conversation unsubscribe conv_123 --message msg_456 --dry-run
 # With --method
 heo conversation unsubscribe conv_123 --method mailto
 # Basic use
