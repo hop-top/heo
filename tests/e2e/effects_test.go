@@ -36,6 +36,7 @@ type effectSite struct {
 	cat     model.Channel // ships microsoft.mail.categories
 	dr      model.Channel // ships google.mail.reply_draft
 	un      model.Channel // ships google.mail.unsubscribe
+	fw      model.Channel // ships google.mail.forward
 	st      model.Channel // declares every provider conversation state capability: account scope, labels
 	sf      model.Channel // declares archive, move and flag: shared scope, folder moves, the star flag
 	tk      model.Channel // declares extension_execute, ships zendesk's update only
@@ -64,6 +65,7 @@ func newEffectSite(t *testing.T, profile string) *effectSite {
 	s.cat = c.fakeOf(adapterstest.CategoriesType, "cat", adapterstest.Config{Account: "acct-cat"})
 	s.dr = c.fakeOf(adapterstest.DraftsType, "dr", adapterstest.Config{Account: "acct-dr"})
 	s.un = c.fakeOf(adapterstest.UnsubscribeType, "un", adapterstest.Config{Account: "acct-un"})
+	s.fw = c.fakeOf(adapterstest.ForwardType, "fw", adapterstest.Config{Account: "acct-fw"})
 	s.st = c.fakeOf(adapterstest.StateType, "st", adapterstest.Config{Account: "acct-st"})
 	s.sf = c.fakeOf(adapterstest.StateFolderType, "sf", adapterstest.Config{Account: "acct-sf"})
 	s.tk = c.fakeOf(adapterstest.TicketEffectType, "tk", adapterstest.Config{Account: "acct-tk"})
@@ -77,6 +79,7 @@ func newEffectSite(t *testing.T, profile string) *effectSite {
 		{"cat", "catin", "cat-1", model.ModePerContact},
 		{"dr", "drin", "dr-1", model.ModePerContact},
 		{"un", "unin", "un-1", model.ModePerContact},
+		{"fw", "fwin", "fw-1", model.ModePerContact},
 		{"st", "stin", "st-1", model.ModePerContact},
 		{"sf", "sfin", "sf-1", model.ModePerContact},
 		{"mb", "mbin", "mb-1", model.ModePerContact},

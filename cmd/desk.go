@@ -32,6 +32,9 @@ const (
 	flagSort         = "sort"
 	flagUpdatedSince = "updated-since"
 	flagPlacement    = "placement"
+	flagMessageID    = "message-id"
+	flagReferences   = "references"
+	flagProviderID   = "provider-id"
 )
 
 // internalAudience is the audience of internal notes: reading them is
@@ -303,7 +306,22 @@ func searchFilter(cmd *cobra.Command, f desk.Filter) (desk.Filter, error) {
 		return f, err
 	}
 	f.Until, err = timeFlag(cmd, flagUntil)
-	return f, err
+	if err != nil {
+		return f, err
+	}
+	for _, id := range []struct {
+		flag string
+		dst  *string
+	}{{flagMessageID, &f.MessageID}, {flagReferences, &f.References}, {flagProviderID, &f.ProviderID}} {
+		if !cmd.Flags().Changed(id.flag) {
+			continue
+		}
+		*id.dst, _ = cmd.Flags().GetString(id.flag)
+		if strings.TrimSpace(*id.dst) == "" {
+			return f, output.UsageError("--" + id.flag + ": an identifier is required")
+		}
+	}
+	return f, nil
 }
 
 // addTextFlag adds the required --text a write sends.

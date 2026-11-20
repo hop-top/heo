@@ -27,6 +27,7 @@ try.
 | `conversation update` | `extension_execute`, with the update effect the adapter ships for its work items | changes the provider-owned fields of the issue or ticket a conversation is; fields uma owns change in uma on any channel ([issues-and-tickets.md](issues-and-tickets.md#change-fields)) |
 | `message reply`, `message reply-draft` with `--reply-all`, `--cc`, `--bcc` | `reply_recipients` | addresses a reply beyond the reply route: the other recipients of the message answered, and explicit cc and bcc; a reply without them needs no capability ([conversations.md](conversations.md#reply-to-all-cc-and-bcc)) |
 | `message reply-draft` | `extension_execute`, with Gmail's or Outlook's reply draft | keeps a reply in the mailbox's Drafts for a person to finish and send; sends nothing ([conversations.md](conversations.md#keep-a-reply-as-a-provider-draft)) |
+| `message forward` | `extension_execute`, with Gmail's forward | sends a copy of one message to another address with the original attached whole as `message/rfc822`; an adapter that cannot attach it is refused, never sent an inline copy; irreversible ([conversations.md](conversations.md#forward-a-message-to-another-address)) |
 | `conversation unsubscribe` | `extension_execute`, with Gmail's or Outlook's unsubscribe | asks the sender of the message a mail conversation replies to to stop mailing the mailbox, by what the message's own headers allow; irreversible ([conversations.md](conversations.md#unsubscribe-from-a-sender)) |
 | `conversation tag` | `extension_execute`, with Gmail's label change (`--add`, `--remove`) or Outlook's category change (`--set`) | changes the provider's own tags on the message a mail conversation replies to ([conversations.md](conversations.md#tag-a-mail-message-at-the-provider)) |
 | `provider-label list` | `extension_query`, with `<type>.mailboxes` | lists the mailboxes (Gmail labels, Exchange folders and categories, IMAP mailboxes) of the account a mail channel is ([conversations.md](conversations.md#list-and-create-provider-mailboxes)) |
@@ -516,6 +517,7 @@ named in heo.
 | `conversation tag` | `google.mail.labels` | `--add`, `--remove`: label IDs | `conversation.label` |
 | `conversation tag` | `microsoft.mail.categories` | `--set`: the whole list of category names | `conversation.label` |
 | `message reply-draft` | `google.mail.reply_draft`, `microsoft.mail.reply_draft` | `--text`; `--draft` to replace or, with `--delete`, remove one | `message.reply` |
+| `message forward` | `google.mail.forward` | `--to`: one bare address; `--text`: the note | `extension.execute` |
 | `conversation unsubscribe` | `google.mail.unsubscribe`, `microsoft.mail.unsubscribe` | `--method` (`auto`, `one_click`, `mailto`); no URL, no address | `extension.execute` |
 | `interaction open-modal` | `slack.chat.views.open` | `--view`; the interaction's trigger | `extension.execute` |
 | `interaction push-modal` | `slack.chat.views.push` | `--view`; the interaction's trigger | `extension.execute` |
@@ -694,6 +696,7 @@ only. `github.issues` shows the `replies` switch in
 | `message edit`, `message delete`, `reaction add`, `reaction remove`, `conversation status`, `conversation update` | `desk` (policy actions `message.edit`, `message.delete`, `message.react`, `work_item.act`; the adapter's update effect is authorized as `work_item.act` by its definition) |
 | `conversation tag` | `desk` (policy action `conversation.label`, which uma's definition of both mail effects names; the same action as `conversation label`) |
 | `message reply-draft` | `desk` (policy action `message.reply`, which uma's definition of both draft effects names; the same action as `message reply`) |
+| `message forward` | `desk` (policy action `extension.execute`, which uma's definition of the forward effect names: a copy of the mail to a third party, so its own permission, not a reply's) |
 | `conversation unsubscribe` | `desk` (policy action `extension.execute`, which uma's definition of both unsubscribe effects names: a request to a third party, so its own permission, not a label's or a reply's) |
 | `conversation archive`, `unarchive`, `move`, `read`, `unread`, `flag`, `unflag`, `trash`, `untrash` | `desk` (policy action `conversation.state_account` when the channel reports account scope, a mailbox's own view, `conversation.state_shared` when it reports shared scope, a chat room or a tracker; uma picks it from the scope and authorizes it as the caller at submission and again before every attempt) |
 | `participant add`, `participant remove` | `desk`, on the conversation's internal audience (policy action `conversation.membership`) |

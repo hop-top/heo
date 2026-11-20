@@ -40,6 +40,10 @@ const (
 	DraftsType model.TypeKey = "test.heo.fake.drafts"
 	// UnsubscribeType ships Gmail's unsubscribe, google.mail.unsubscribe.
 	UnsubscribeType model.TypeKey = "test.heo.fake.unsubscribe"
+	// ForwardType ships Gmail's forward, google.mail.forward, and reports
+	// the Message-ID the forwarded copy carries (ForwardMessageID), as
+	// Gmail's send does.
+	ForwardType model.TypeKey = "test.heo.fake.forward"
 	// TicketEffectType ships Zendesk's ticket update only: it declares
 	// extension_execute, yet runs none of the effects above.
 	TicketEffectType model.TypeKey = "test.heo.fake.ticketeffect"
@@ -117,7 +121,7 @@ func (f *Factory) ValidateAction(aud model.Audience, action model.Extension) []m
 		owner = google.NewFactory(google.Options{})
 	case microsoft.ExtensionCategories:
 		owner = microsoft.NewFactory(microsoft.Options{})
-	case google.ExtensionReplyDraft, google.ExtensionUnsubscribe:
+	case google.ExtensionReplyDraft, google.ExtensionUnsubscribe, google.ExtensionForward:
 		owner = google.NewFactory(google.Options{})
 	case microsoft.ExtensionReplyDraft, microsoft.ExtensionUnsubscribe:
 		owner = microsoft.NewFactory(microsoft.Options{})
@@ -171,7 +175,20 @@ func (i *instance) Execute(_ context.Context, r adapter.ExecuteRequest) (adapter
 			ID: fmt.Sprintf("V%09d", viewSeq.Add(1)),
 		}}
 	}
+	if r.Action.Name == google.ExtensionForward {
+		// As Gmail's send does: the copy's own Message-ID, which the
+		// destination's mailbox holds it under.
+		out.References = []model.ExternalRef{{
+			Channel: i.ch.Ref, Namespace: model.EmailHeaderNamespace, Kind: model.RefKindEmailMessageID, ID: ForwardMessageID(r.Operation),
+		}}
+	}
 	return out, nil
+}
+
+// ForwardMessageID is the Message-ID of the copy the fake's forward of
+// operation op sends.
+func ForwardMessageID(op model.OperationRef) string {
+	return "<fwd-" + string(op.ID) + "@fake.test>"
 }
 
 // viewSeq numbers the views the fake shows.

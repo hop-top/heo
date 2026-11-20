@@ -122,6 +122,14 @@ type Inject struct {
 	// or quote reply); uma resolves it when it holds that message in
 	// the conversation. None when empty.
 	InReplyTo string `json:"in_reply_to,omitempty"`
+	// EmailMessageID, EmailReferences and EmailInReplyTo are the mail's
+	// own threading headers ("<left@right>"), reported as an email
+	// adapter reports them (model.EmailHeaders), so a test can have a
+	// forwarded copy arrive with the original's Message-ID in its
+	// References. None when empty.
+	EmailMessageID  string   `json:"email_message_id,omitempty"`
+	EmailReferences []string `json:"email_references,omitempty"`
+	EmailInReplyTo  string   `json:"email_in_reply_to,omitempty"`
 	// Destination is the inbox destination the envelope is for.
 	Destination string `json:"destination"`
 	// Text is the envelope's text part, none when empty.
@@ -246,6 +254,12 @@ func (i *instance) envelope(ctx context.Context, sink adapter.Sink, in Inject) (
 		if in.Kind == model.EnvelopeWorkItem {
 			env.MessageID, env.Sender = "", model.ExternalRef{}
 		}
+	}
+	if in.EmailMessageID != "" || len(in.EmailReferences) > 0 || in.EmailInReplyTo != "" {
+		norm := model.EmailHeaders{
+			MessageID: in.EmailMessageID, InReplyTo: in.EmailInReplyTo, References: strings.Join(in.EmailReferences, " "),
+		}.Normalize(i.ch.Ref)
+		env.References = append(env.References, norm.References...)
 	}
 	if in.Room != "" {
 		env.References = append(env.References, model.ExternalRef{

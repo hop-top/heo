@@ -440,6 +440,50 @@ never matches a provider's labels to these by name.
 The output of `conversation label` lists the labels the conversation
 holds after the write, by name, and those it added or removed.
 
+### Forward a message to another address
+
+`message forward <message> --to <address>` sends a copy of one message from
+its own mailbox, with the original attached whole as `message/rfc822`
+([RFC 2046](https://www.rfc-editor.org/rfc/rfc2046) section 5.2.1): its
+headers, body and attachments, byte for byte, under the note `--text` (a
+fixed line when there is none). The adapter reads the original again from
+the provider when the operation runs; heo composes none of it. It moves a
+message between two accounts: forward from the source account, then, in the
+destination account, find the copy, label it and archive it.
+
+```sh
+heo message forward msg_123 --to desk@example.com --dry-run
+heo message forward msg_123 --to desk@example.com --text "Yours to handle." --idempotency-key fwd-123
+```
+
+- `--dry-run` prints the recipient, that the original travels attached, its
+  size (read from the provider when the channel serves raw bytes, else
+  unknown) and how the copy is found, and sends nothing.
+- Only a channel whose adapter ships a forward effect can (`google.mail`).
+  An adapter that cannot attach the original (`microsoft.mail`, `imap.mail`,
+  `smtp.mail`) is refused, exit 2 (UNSUPPORTED), before anything is written:
+  heo never sends an inline, lossy copy instead. An internal note, a deleted
+  or redacted message, and one the provider holds no copy of are refused.
+- The copy is `Fwd:` and the original's subject. Its `References` names the
+  original's `Message-ID` and it has no `In-Reply-To`, so it is no reply and
+  starts its own thread.
+- Find the copy where it arrives, in a heo mailbox that receives it, by exact
+  match over what the store holds: `message list --references
+  '<original Message-ID>'` matches a message whose `References` or
+  `In-Reply-To` names it (the copy, and any reply to the original),
+  `message list --message-id '<id>'` a message whose own `Message-ID` is `id`
+  (the copy's, which the operation reports among its provider references once
+  the provider accepted it: `delivery get`), and `message list --provider-id
+  <id>` the provider's own message ID. Filters combine by AND, take no fuzzy
+  match, and a search page can be short and still incomplete: follow `next`
+  until `complete`. Then `conversation archive` and `conversation tag` with
+  `--message <record ID>` act on exactly that message.
+- The forward is queued, never sent when the command returns: `delivery get`
+  follows it. It is irreversible, a plugin actor's is held for a decision
+  (trust class `forward`), and forwarding does not change the original:
+  trash it with `conversation trash --message` once `delivery get` says the
+  copy left.
+
 ### Keep a reply as a provider draft
 
 `message reply` sends. `message reply-draft` leaves the reply in the
