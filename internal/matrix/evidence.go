@@ -231,6 +231,10 @@ var evidence = map[string]Evidence{
 	key(model.TypeMicrosoftMail, "message reply-draft"):      {behavior("TestReplyDraftQueuesMailEffects", "TestReplyDraftPreviewChecks", "TestHeldReplyDraft"), InProcess},
 	key(model.TypeGoogleMail, "conversation unsubscribe"):    {behavior("TestUnsubscribeQueuesMailEffects", "TestUnsubscribePreviewChecks", "TestHeldUnsubscribe"), InProcess},
 	key(model.TypeMicrosoftMail, "conversation unsubscribe"): {behavior("TestUnsubscribeQueuesMailEffects", "TestUnsubscribePreviewChecks", "TestHeldUnsubscribe"), InProcess},
+	// The forward runs google.mail's own effect the same way: previewed and
+	// queued in process, held for a plugin actor; no request reaches Gmail.
+	// Attaching the original as message/rfc822 is uma's and is tested there.
+	key(model.TypeGoogleMail, "message forward"): {behavior("TestForwardQueuesMailEffect", "TestForwardRefusals", "TestHeldForward"), InProcess},
 
 	// imap.mail, google.mail and microsoft.mail declare history import. Gmail
 	// and Graph run it through the daemon against the answers of uma's own
@@ -331,6 +335,7 @@ var gates = []struct {
 	{"message raw", []string{"TestMessageRawLifecycle"}},
 	{"message reply-draft", []string{"TestMessageReplyDraftLifecycle"}},
 	{"conversation unsubscribe", []string{"TestConversationUnsubscribeLifecycle"}},
+	{"message forward", []string{"TestMessageForwardAndFindTheCopy"}},
 	{"conversation archive", []string{"TestConversationStateLifecycle"}},
 	{"conversation unarchive", []string{"TestConversationStateLifecycle"}},
 	{"conversation move", []string{"TestConversationStateLifecycle"}},

@@ -157,7 +157,7 @@ and `make docs-check` fails when it is stale.
 | `native.webwidget` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `native.webwidget` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `native.webwidget` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `native.webwidget` | message forward | no | none | fake provider | experimental |
+| `native.webwidget` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `native.webwidget` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `native.webwidget` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `native.webwidget` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -185,7 +185,7 @@ and `make docs-check` fails when it is stale.
 | `smtp.mail` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `smtp.mail` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `smtp.mail` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `smtp.mail` | message forward | no | none | fake provider | experimental |
+| `smtp.mail` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `smtp.mail` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `smtp.mail` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `smtp.mail` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -213,7 +213,7 @@ and `make docs-check` fails when it is stale.
 | `imap.mail` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `imap.mail` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `imap.mail` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `imap.mail` | message forward | no | none | fake provider | experimental |
+| `imap.mail` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `imap.mail` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `imap.mail` | conversation archive | yes | none | none | experimental |
 | `imap.mail` | conversation unarchive | yes | none | none | experimental |
@@ -241,7 +241,7 @@ and `make docs-check` fails when it is stale.
 | `google.mail` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `google.mail` | conversation tag | yes | `TestTagQueuesMailEffects`, `TestTagPreviewChecksTheFields` | in-process | experimental |
 | `google.mail` | message reply-draft | yes | `TestReplyDraftQueuesMailEffects`, `TestReplyDraftPreviewChecks`, `TestHeldReplyDraft` | in-process | experimental |
-| `google.mail` | message forward | yes | none | none | experimental |
+| `google.mail` | message forward | yes | `TestForwardQueuesMailEffect`, `TestForwardRefusals`, `TestHeldForward` | in-process | experimental |
 | `google.mail` | conversation unsubscribe | yes | `TestUnsubscribeQueuesMailEffects`, `TestUnsubscribePreviewChecks`, `TestHeldUnsubscribe` | in-process | experimental |
 | `google.mail` | conversation archive | yes | `TestStateQueuesProviderStateOperations`, `TestStatePreviewReadsTheChannelsLimits`, `TestHeldStateChanges` | in-process | experimental |
 | `google.mail` | conversation unarchive | yes | `TestStateQueuesProviderStateOperations`, `TestStatePreviewReadsTheChannelsLimits`, `TestHeldStateChanges` | in-process | experimental |
@@ -269,7 +269,7 @@ and `make docs-check` fails when it is stale.
 | `microsoft.mail` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `microsoft.mail` | conversation tag | yes | `TestTagQueuesMailEffects`, `TestTagPreviewChecksTheFields` | in-process | experimental |
 | `microsoft.mail` | message reply-draft | yes | `TestReplyDraftQueuesMailEffects`, `TestReplyDraftPreviewChecks`, `TestHeldReplyDraft` | in-process | experimental |
-| `microsoft.mail` | message forward | no | none | fake provider | experimental |
+| `microsoft.mail` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `microsoft.mail` | conversation unsubscribe | yes | `TestUnsubscribeQueuesMailEffects`, `TestUnsubscribePreviewChecks`, `TestHeldUnsubscribe` | in-process | experimental |
 | `microsoft.mail` | conversation archive | yes | `TestStateQueuesProviderStateOperations`, `TestStatePreviewReadsTheChannelsLimits`, `TestHeldStateChanges` | in-process | experimental |
 | `microsoft.mail` | conversation unarchive | yes | `TestStateQueuesProviderStateOperations`, `TestStatePreviewReadsTheChannelsLimits`, `TestHeldStateChanges` | in-process | experimental |
@@ -297,7 +297,7 @@ and `make docs-check` fails when it is stale.
 | `twilio.sms` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `twilio.sms` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `twilio.sms` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `twilio.sms` | message forward | no | none | fake provider | experimental |
+| `twilio.sms` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `twilio.sms` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `twilio.sms` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `twilio.sms` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -325,7 +325,7 @@ and `make docs-check` fails when it is stale.
 | `twilio.whatsapp` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `twilio.whatsapp` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `twilio.whatsapp` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `twilio.whatsapp` | message forward | no | none | fake provider | experimental |
+| `twilio.whatsapp` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `twilio.whatsapp` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `twilio.whatsapp` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `twilio.whatsapp` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -353,7 +353,7 @@ and `make docs-check` fails when it is stale.
 | `meta.whatsapp` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `meta.whatsapp` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `meta.whatsapp` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `meta.whatsapp` | message forward | no | none | fake provider | experimental |
+| `meta.whatsapp` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `meta.whatsapp` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `meta.whatsapp` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `meta.whatsapp` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -381,7 +381,7 @@ and `make docs-check` fails when it is stale.
 | `relay.messages` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `relay.messages` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `relay.messages` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `relay.messages` | message forward | no | none | fake provider | experimental |
+| `relay.messages` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `relay.messages` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `relay.messages` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `relay.messages` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -409,7 +409,7 @@ and `make docs-check` fails when it is stale.
 | `discord.chat` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `discord.chat` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `discord.chat` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `discord.chat` | message forward | no | none | fake provider | experimental |
+| `discord.chat` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `discord.chat` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `discord.chat` | conversation archive | yes | none | none | experimental |
 | `discord.chat` | conversation unarchive | yes | none | none | experimental |
@@ -437,7 +437,7 @@ and `make docs-check` fails when it is stale.
 | `slack.chat` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `slack.chat` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `slack.chat` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `slack.chat` | message forward | no | none | fake provider | experimental |
+| `slack.chat` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `slack.chat` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `slack.chat` | conversation archive | yes | none | none | experimental |
 | `slack.chat` | conversation unarchive | yes | none | none | experimental |
@@ -465,7 +465,7 @@ and `make docs-check` fails when it is stale.
 | `telegram.messages` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `telegram.messages` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `telegram.messages` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `telegram.messages` | message forward | no | none | fake provider | experimental |
+| `telegram.messages` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `telegram.messages` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `telegram.messages` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `telegram.messages` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -493,7 +493,7 @@ and `make docs-check` fails when it is stale.
 | `microsoft.teams` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `microsoft.teams` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `microsoft.teams` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `microsoft.teams` | message forward | no | none | fake provider | experimental |
+| `microsoft.teams` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `microsoft.teams` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `microsoft.teams` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `microsoft.teams` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -521,7 +521,7 @@ and `make docs-check` fails when it is stale.
 | `github.issues` | conversation update | yes | `TestUpdateRoutesByWhatTheAdapterDeclares`, `TestConversationUpdateLifecycle` | in-process | experimental |
 | `github.issues` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `github.issues` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `github.issues` | message forward | no | none | fake provider | experimental |
+| `github.issues` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `github.issues` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `github.issues` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `github.issues` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -549,7 +549,7 @@ and `make docs-check` fails when it is stale.
 | `zendesk.tickets` | conversation update | yes | `TestUpdateRoutesByWhatTheAdapterDeclares`, `TestWorkItemsThroughConversations`, `TestConversationUpdateLifecycle` (check only) | in-process | experimental |
 | `zendesk.tickets` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `zendesk.tickets` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `zendesk.tickets` | message forward | no | none | fake provider | experimental |
+| `zendesk.tickets` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `zendesk.tickets` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `zendesk.tickets` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `zendesk.tickets` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -577,7 +577,7 @@ and `make docs-check` fails when it is stale.
 | `gitlab.issues` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `gitlab.issues` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `gitlab.issues` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `gitlab.issues` | message forward | no | none | fake provider | experimental |
+| `gitlab.issues` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `gitlab.issues` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `gitlab.issues` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `gitlab.issues` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -605,7 +605,7 @@ and `make docs-check` fails when it is stale.
 | `jira.issues` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `jira.issues` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `jira.issues` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `jira.issues` | message forward | no | none | fake provider | experimental |
+| `jira.issues` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `jira.issues` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `jira.issues` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `jira.issues` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |
@@ -633,7 +633,7 @@ and `make docs-check` fails when it is stale.
 | `linear.issues` | conversation update | no | `TestConversationUpdateLifecycle`, `TestChannelVerbsOfflineAndLive` | fake provider | experimental |
 | `linear.issues` | conversation tag | no | `TestConversationTagLifecycle` | fake provider | experimental |
 | `linear.issues` | message reply-draft | no | `TestMessageReplyDraftLifecycle` | fake provider | experimental |
-| `linear.issues` | message forward | no | none | fake provider | experimental |
+| `linear.issues` | message forward | no | `TestMessageForwardAndFindTheCopy` | fake provider | experimental |
 | `linear.issues` | conversation unsubscribe | no | `TestConversationUnsubscribeLifecycle` | fake provider | experimental |
 | `linear.issues` | conversation archive | no | `TestConversationStateLifecycle` | fake provider | experimental |
 | `linear.issues` | conversation unarchive | no | `TestConversationStateLifecycle` | fake provider | experimental |

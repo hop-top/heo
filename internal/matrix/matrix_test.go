@@ -113,7 +113,7 @@ func TestDeclaredVerbsPerAdapter(t *testing.T) {
 		model.TypeNativeWebWidget: append(slices.Clone(all), "receipt send", "interaction respond"),
 		model.TypeSmtpMail:        {},
 		model.TypeImapMail:        slices.Concat([]string{"message raw", "history fetch"}, state),
-		model.TypeGoogleMail:      slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "conversation unsubscribe"}, state),
+		model.TypeGoogleMail:      slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "message forward", "conversation unsubscribe"}, state),
 		model.TypeMicrosoftMail:   slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "conversation unsubscribe"}, state),
 		model.TypeTwilioSms:       {"history fetch"},
 		model.TypeTwilioWhatsapp:  {},
@@ -214,7 +214,8 @@ func TestDeclaredCapabilitiesPerAdapter(t *testing.T) {
 				"raw_read", "extension_query", "google.mail.mailboxes", "google.mail.mailbox_create"},
 			effects: []string{"google.mail.mailboxes v1 read needs google.mail.mailboxes",
 				"google.mail.mailbox_create v1 effect needs google.mail.mailbox_create", "google.mail.labels v1 effect needs extension_execute",
-				"google.mail.reply_draft v1 effect needs extension_execute", "google.mail.unsubscribe v1 effect needs extension_execute"},
+				"google.mail.reply_draft v1 effect needs extension_execute", "google.mail.forward v1 effect needs extension_execute",
+				"google.mail.unsubscribe v1 effect needs extension_execute"},
 		},
 		model.TypeMicrosoftMail: {
 			capabilities: []string{"receive", "receive_http", "send", "reconcile", "start_conversation", "extension_execute",
