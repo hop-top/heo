@@ -167,7 +167,7 @@ func (a *app) channelGetCmd() *cobra.Command {
 		Long: `Show the channel <channel>, by key or ID: its adapter type, its
 configuration, its credential reference and its revision (what
 ` + "`channel update --revision`" + ` takes), and verbs: for each
-provider-dependent verb (` + "`message edit`, `message delete`, `reaction add`, `reaction remove`, `participant add`, `participant remove`, `receipt send`, `history fetch`, `interaction respond`, `interaction open-modal`, `interaction push-modal`, `interaction update-modal`, `issue transition`, `issue update`, `ticket transition`, `conversation tag`, `message reply-draft`, `conversation unsubscribe`, `conversation archive`, `conversation unarchive`, `conversation move`, `conversation read`, `conversation unread`, `conversation flag`, `conversation unflag`, `conversation trash`, `conversation untrash`" + `)
+provider-dependent verb (` + "`message edit`, `message delete`, `reaction add`, `reaction remove`, `participant add`, `participant remove`, `receipt send`, `history fetch`, `interaction respond`, `interaction open-modal`, `interaction push-modal`, `interaction update-modal`, `issue transition`, `issue update`, `ticket transition`, `conversation tag`, `message reply-draft`, `message forward`, `conversation unsubscribe`, `conversation archive`, `conversation unarchive`, `conversation move`, `conversation read`, `conversation unread`, `conversation flag`, `conversation unflag`, `conversation trash`, `conversation untrash`" + `)
 the capability it needs and whether this channel's adapter declares it
 (state declared or unsupported); and reply_recipients, which
 ` + "`message reply`" + ` and ` + "`message reply-draft`" + ` need only for --reply-all, --cc

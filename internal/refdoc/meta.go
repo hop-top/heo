@@ -143,6 +143,7 @@ var verbs = map[string]Meta{
 	"message raw":           {anyReader, "Messages.List (scanned for the record ID); Messages.Raw", ""},
 	"message reply":         {Desk, "Messages.Reply", ""},
 	"message reply-draft":   {Desk, "Extensions.Execute (mail reply draft)", ""},
+	"message forward":       {Desk, "Extensions.Execute (mail forward)", ""},
 	"message send":          {Desk, "Conversations.Start", ""},
 
 	"note add":  {Desk, "Messages.AddInternalNote", ""},
@@ -292,7 +293,7 @@ var Catalog = []string{
 	"conversation link", "conversation unlink", "conversation status", "conversation update",
 	"conversation summarize", "conversation triage", "message draft",
 	"label create", "label list", "provider-label list", "provider-label create",
-	"message list", "message get", "message reply", "message reply-draft", "message send", "message search",
+	"message list", "message get", "message reply", "message reply-draft", "message forward", "message send", "message search",
 	"message edit", "message delete", "message raw",
 	"note list", "note get", "note add",
 	"attachment list", "attachment get", "attachment download",

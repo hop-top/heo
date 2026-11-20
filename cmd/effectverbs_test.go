@@ -136,7 +136,7 @@ func TestConversationTagRows(t *testing.T) {
 // idempotent under their key, like the other provider writes.
 func TestEffectVerbsAreSharedWrites(t *testing.T) {
 	a := newApp()
-	for _, path := range []string{"conversation update", "conversation tag", "message reply-draft", "conversation unsubscribe"} {
+	for _, path := range []string{"conversation update", "conversation tag", "message reply-draft", "message forward", "conversation unsubscribe"} {
 		c := find(a.r.Cmd, path)
 		if c == nil {
 			t.Fatalf("%s: not in the tree", path)

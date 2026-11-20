@@ -25,6 +25,7 @@ package desk
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -143,6 +144,10 @@ type Filter struct {
 	Text         string
 	Since        *time.Time
 	Until        *time.Time
+	// MessageID, References and ProviderID select messages by identifiers
+	// they already hold, exactly: see MessageMatch. heo adds no index; the
+	// listing is scanned.
+	MessageID, References, ProviderID string
 	// Sort orders a conversation listing: SortLastActivity or empty for
 	// uma's own order. UpdatedSince keeps the conversations whose last
 	// activity is after it. Only ListConversationItems honours either.
@@ -265,12 +270,107 @@ func (s Service) ListMessages(ctx context.Context, f Filter, page model.PageRequ
 	if err != nil {
 		return model.Page[model.Message]{}, err
 	}
+	match, err := f.match()
+	if err != nil {
+		return model.Page[model.Message]{}, err
+	}
+	if match != nil {
+		return s.scanMessages(ctx, filter, page, match)
+	}
 	p, err := s.Client.Messages().List(ctx, model.ListRequest{Call: call(), Filter: filter, Page: page})
 	if err != nil {
 		return model.Page[model.Message]{}, err
 	}
 	p.Items = s.visible(p.Items, false)
 	return p, nil
+}
+
+// maxScanCalls bounds the uma pages one identifier search reads: a store
+// larger than that is searched across calls, following Next.
+const maxScanCalls = 50
+
+// scanMessages lists the messages of filter that match, as ListNotes lists
+// notes: uma has no identifier filter, so it scans pages until the page
+// holds page.Limit matches, the listing ends, or maxScanCalls pages were
+// read (Next then continues the scan; the page is short and incomplete).
+func (s Service) scanMessages(ctx context.Context, filter model.Filter, page model.PageRequest, match func(model.Message) bool) (model.Page[model.Message], error) {
+	out := model.Page[model.Message]{Items: []model.Message{}}
+	req := model.ListRequest{Call: call(), Filter: filter, Page: page}
+	for range maxScanCalls {
+		// Asking for no more than the matches still wanted keeps the page
+		// within its limit: no match is passed over.
+		req.Page.Limit = page.Limit - len(out.Items)
+		p, err := s.Client.Messages().List(ctx, req)
+		if err != nil {
+			return model.Page[model.Message]{}, err
+		}
+		for _, m := range s.visible(p.Items, false) {
+			if match(m) {
+				out.Items = append(out.Items, m)
+			}
+		}
+		out.Next, out.Complete = p.Next, p.Complete
+		if p.Complete || p.Next == "" || len(out.Items) >= page.Limit {
+			return out, nil
+		}
+		req.Page.After = p.Next
+	}
+	return out, nil
+}
+
+// match is the predicate of f's identifier filters: every one set must
+// hold. Nil when none is set. An identifier that is not one is
+// model.Validation.
+func (f Filter) match() (func(model.Message) bool, error) {
+	var preds []func(model.Message) bool
+	if f.MessageID != "" {
+		id, err := msgID("--message-id", f.MessageID)
+		if err != nil {
+			return nil, err
+		}
+		preds = append(preds, hasRef(model.EmailHeaderNamespace, id, model.RefKindEmailMessageID))
+	}
+	if f.References != "" {
+		id, err := msgID("--references", f.References)
+		if err != nil {
+			return nil, err
+		}
+		preds = append(preds, hasRef(model.EmailHeaderNamespace, id, model.RefKindEmailReferences, model.RefKindEmailInReplyTo))
+	}
+	if f.ProviderID != "" {
+		preds = append(preds, hasRef(model.ProviderMessageNamespace, f.ProviderID, model.RefKindMessage))
+	}
+	if len(preds) == 0 {
+		return nil, nil
+	}
+	return func(m model.Message) bool {
+		for _, p := range preds {
+			if !p(m) {
+				return false
+			}
+		}
+		return true
+	}, nil
+}
+
+// msgID checks that v is one RFC 5322 msg-id, with or without its angle
+// brackets, and returns it as the headers hold it: "<left@right>".
+func msgID(flag, v string) (string, error) {
+	id := "<" + strings.TrimSuffix(strings.TrimPrefix(v, "<"), ">") + ">"
+	if ids := model.ParseMsgIDs(id); len(ids) != 1 || ids[0] != id {
+		return "", model.NewError(model.Validation, fmt.Sprintf("%s %q: want one Message-ID (left@right)", flag, v))
+	}
+	return id, nil
+}
+
+// hasRef is the predicate: m holds a reference of one of kinds in
+// namespace whose ID is exactly id.
+func hasRef(namespace, id string, kinds ...string) func(model.Message) bool {
+	return func(m model.Message) bool {
+		return slices.ContainsFunc(m.External, func(x model.ExternalRef) bool {
+			return x.Namespace == namespace && x.ID == id && slices.Contains(kinds, x.Kind)
+		})
+	}
 }
 
 // ListNotes returns one page of the internal notes the caller may read,

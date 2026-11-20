@@ -90,6 +90,11 @@ var providerVerbs = []Verb{
 	// message reply-draft keeps a reply as a draft in the mailbox, for a
 	// person to finish and send: each mail adapter's reply_draft effect.
 	{Name: "message reply-draft", Capability: model.CapabilityExtensionExecute, Extensions: []string{google.ExtensionReplyDraft, microsoft.ExtensionReplyDraft}},
+	// message forward sends a copy of one message to another address with
+	// the original attached whole as message/rfc822: only an adapter that
+	// ships the forward effect can; one that cannot is refused rather than
+	// sent a lossy inline copy.
+	{Name: "message forward", Capability: model.CapabilityExtensionExecute, Extensions: []string{google.ExtensionForward}},
 	// conversation unsubscribe asks the sender of the message a mail
 	// conversation replies to to stop mailing the mailbox, by what the
 	// message's own headers allow: each mail adapter's unsubscribe effect.

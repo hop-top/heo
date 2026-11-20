@@ -204,6 +204,7 @@ plugin](manual/hooks.md#write-a-plugin-in-any-language); `heo hook` runs, tests 
 | `heo message delete` | Delete a message at its provider (a tombstone) (needs `delete`) | `destructive-shared` | desk | `heo message delete msg_123 --revision rev_9 --dry-run` |
 | `heo message draft` | Draft a reply to a conversation; it is never sent | `read` | desk | `heo message draft conv_123` |
 | `heo message edit` | Edit a message at its provider (needs `edit`) | `write-shared` | desk | `heo message edit msg_123 --revision rev_9 --text "Corrected: 10:30." --dry-run` |
+| `heo message forward` | Forward a message to another address with the original attached (needs `extension_execute`) | `write-shared` | desk | `heo message forward msg_123 --to desk@example.com --dry-run` |
 | `heo message get` | Show one message | `read` | desk, viewer, external | `heo message get msg_123` |
 | `heo message list` | List or search messages across the inboxes you may read | `read` | desk, viewer, external | `heo message list --conversation conv_123` |
 | `heo message raw` | Export a message's RFC 5322 bytes from its provider (needs `raw_read`) | `read` | desk, viewer, external | `heo message raw msg_123` |

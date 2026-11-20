@@ -30,7 +30,7 @@ While holding is on, a plugin write is held when its verb can be
 previewed (`--dry-run`) and uma can hold it. That is `message reply`,
 `message send` (a conversation start), `message edit`, `message delete`,
 `reaction add|remove`, `note add`, `conversation label`, `conversation
-tag`, `message reply-draft`, `conversation unsubscribe`, `conversation` state verbs (`close`, `resolve`, `reopen` and the
+tag`, `message reply-draft`, `message forward`, `conversation unsubscribe`, `conversation` state verbs (`close`, `resolve`, `reopen` and the
 others), the provider state verbs (`conversation archive`, `unarchive`, `move`, `read`, `unread`, `flag`, `unflag`,
 `trash` and `untrash`), `conversation status` and `conversation update` of a provider-owned status or fields, `provider-label create`, and `label create`. A held write returns the operation's ID
 with state `held`; nothing is written or delivered until it is approved,
@@ -89,7 +89,7 @@ The classes of the held verbs: `reply:send`, `note:local|provider`,
 `status:<status>` (`conversation status`: the work item's status, apart from the conversation's own `state`),
 `fields:<keys>` (`conversation update`: the fields asked for, sorted and comma separated),
 `label-create:<name>`, `provider-label:create` (`provider-label create`), `reply:draft` (`message reply-draft`: create,
-update and delete alike), `unsubscribe` (`conversation unsubscribe`) and the provider state verbs,
+update and delete alike), `forward` (`message forward`), `unsubscribe` (`conversation unsubscribe`) and the provider state verbs,
 which are `state:<class>` or `move`: `archive`, `unarchive`, `read`, `unread`, `star` and `important` (`conversation flag`),
 `unstar` and `unimportant` (`conversation unflag`), `trash`, `untrash`, and `move` (class: the role, the provider ID or the
 label changes). A `move` into the trash role is `trash`, and one into the junk role is `spam`, so no threshold is

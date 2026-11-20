@@ -55,7 +55,7 @@ shows them).`,
 		Args: cobra.NoArgs,
 	}
 	grp.AddCommand(a.messageListCmd(), a.messageGetCmd(), a.messageReplyCmd(), a.messageSendCmd())
-	grp.AddCommand(a.messageEditCmd(), a.messageDeleteCmd(), a.messageDraftCmd(), a.messageReplyDraftCmd(), a.messageRawCmd())
+	grp.AddCommand(a.messageEditCmd(), a.messageDeleteCmd(), a.messageDraftCmd(), a.messageReplyDraftCmd(), a.messageRawCmd(), a.messageForwardCmd())
 	return grp
 }
 
@@ -112,6 +112,9 @@ func addMessageSearchFlags(c *cobra.Command) {
 	c.Flags().String(flagText, "", "Only messages whose text holds all of these words")
 	c.Flags().String(flagSince, "", "Only messages at or after this time (RFC 3339 or date)")
 	c.Flags().String(flagUntil, "", "Only messages before this time (RFC 3339 or date)")
+	c.Flags().String(flagMessageID, "", "Only the message whose own Message-ID header is this (exact)")
+	c.Flags().String(flagReferences, "", "Only messages whose References or In-Reply-To header names this Message-ID (exact): a forward of it, or a reply")
+	c.Flags().String(flagProviderID, "", "Only the message the provider calls this (provider message ID, exact)")
 	addLabelFilterFlags(c, "messages of conversations")
 }
 

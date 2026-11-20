@@ -342,6 +342,7 @@ heo message get <message> [--conversation C]
 heo message raw <message> [--conversation C] [-o FILE|DIR|-] [--force]   # the provider's whole copy: RFC 5322 for mail
 heo message reply <conversation> --text T [--reply-all] [--cc A,..] [--bcc A,..]
 heo message reply-draft <conversation> --text T | --draft ID [--text T | --delete] [--reply-all] [--cc A,..] [--bcc A,..]   # a draft in the mailbox; sends nothing
+heo message forward <message> --to A [--text T]   # a copy to another address, the original attached as message/rfc822
 heo message send --inbox I --to R --text T
 heo message edit <message> --revision REV --text T [--conversation C]
 heo message delete <message> --revision REV [--conversation C] --confirm=yes

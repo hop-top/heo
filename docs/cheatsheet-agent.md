@@ -153,6 +153,7 @@ joined with dots (`conversation.list`). Both list only what you may call.
 | `heo message delete` | `destructive-shared`, idempotent conditional, dry-run | daemon | desk | Messages.Delete | socket only |
 | `heo message draft` | `read`, idempotent yes | daemon | desk | Conversations.List, Messages.List as the caller; then the model | - |
 | `heo message edit` | `write-shared`, idempotent conditional, dry-run | daemon | desk | Messages.Edit | - |
+| `heo message forward` | `write-shared`, idempotent conditional, dry-run | daemon | desk | Extensions.Execute (mail forward) | - |
 | `heo message get` | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (scanned for the record ID) | - |
 | `heo message list` | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (text, time and label filters applied by uma) | - |
 | `heo message raw` | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (scanned for the record ID); Messages.Raw | - |

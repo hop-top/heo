@@ -45,7 +45,7 @@ func TestAdapterVerbsOffline(t *testing.T) {
 		"conversation flag", "conversation unflag", "conversation trash", "conversation untrash"}
 	for typ, want := range map[string][]string{
 		"github.issues":     append(slices.Clone(all), "history fetch", "conversation status", "conversation update"),
-		"google.mail":       slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "conversation unsubscribe"}, state),
+		"google.mail":       slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "message forward", "conversation unsubscribe"}, state),
 		"microsoft.mail":    slices.Concat([]string{"message raw", "history fetch", "conversation tag", "message reply-draft", "conversation unsubscribe"}, state),
 		"native.webwidget":  append(slices.Clone(all), "receipt send", "interaction respond"),
 		"meta.whatsapp":     {"reaction add", "reaction remove"},

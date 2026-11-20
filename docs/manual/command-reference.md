@@ -666,6 +666,7 @@ heo label list --format json
 | `heo message delete` | Delete a message at its provider (a tombstone) (needs `delete`) | `destructive-shared`, idempotent conditional, dry-run | daemon | desk | Messages.Delete | socket only |
 | `heo message draft` | Draft a reply to a conversation; it is never sent | `read`, idempotent yes | daemon | desk | Conversations.List, Messages.List as the caller; then the model | - |
 | `heo message edit` | Edit a message at its provider (needs `edit`) | `write-shared`, idempotent conditional, dry-run | daemon | desk | Messages.Edit | - |
+| `heo message forward` | Forward a message to another address with the original attached (needs `extension_execute`) | `write-shared`, idempotent conditional, dry-run | daemon | desk | Extensions.Execute (mail forward) | - |
 | `heo message get` | Show one message | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (scanned for the record ID) | - |
 | `heo message list` | List or search messages across the inboxes you may read | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (text, time and label filters applied by uma) | - |
 | `heo message raw` | Export a message's RFC 5322 bytes from its provider (needs `raw_read`) | `read`, idempotent yes | daemon | desk, viewer, external | Messages.List (scanned for the record ID); Messages.Raw | - |
@@ -690,6 +691,10 @@ heo message draft conv_123 --format text
 heo message edit msg_123 --revision rev_9 --text "Corrected: 10:30." --dry-run
 # Safe to retry, with an idempotency key
 heo message edit msg_123 --revision rev_9 --text "Corrected: 10:30." --idempotency-key fix-42
+# Preview with --dry-run, change nothing
+heo message forward msg_123 --to desk@example.com --dry-run
+# Safe to retry, with an idempotency key
+heo message forward msg_123 --to desk@example.com --text "Yours to handle." --idempotency-key fwd-123
 # Basic use
 heo message get msg_123
 # JSON for agents

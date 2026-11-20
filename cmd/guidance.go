@@ -156,6 +156,11 @@ var leafNextSteps = map[string][]cli.NextStep{
 		{When: "on success", Suggest: "heo delivery get <operation>", Reason: "the draft is queued, not made: follow it to the mailbox, where its provider ID shows for a later update or delete"},
 		{When: "to send the reply yourself", Suggest: "heo message reply <conversation> --text <text>", Reason: "a draft sends nothing; a reply does"},
 	},
+	"heo message forward": {
+		{When: "after a --dry-run preview", Suggest: "heo message forward <message> --to <address>", Reason: "the real forward; it is irreversible, and a plugin actor's is held for a decision first"},
+		{When: "on success", Suggest: "heo delivery get <operation>", Reason: "the forward is queued, not sent: follow it, and read the copy's own Message-ID among the provider references"},
+		{When: "to find the copy in the destination mailbox", Suggest: "heo message list --references <message-id>", Reason: "the copy's References names the original; uma matches it exactly"},
+	},
 	"heo conversation assign": {
 		{When: "after a --dry-run preview", Suggest: "heo conversation assign <conversation> --to <actor>", Reason: "the real assignment; the preview showed who holds the conversation now"},
 		{When: "on success", Suggest: "heo conversation get <conversation>", Reason: "read back the assignee and the new revision"},

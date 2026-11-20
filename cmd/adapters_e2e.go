@@ -117,6 +117,7 @@ func extraAdapters() []adapters.Adapter {
 		{adapterstest.CategoriesType, microsoft.ExtensionCategories},
 		{adapterstest.DraftsType, google.ExtensionReplyDraft},
 		{adapterstest.UnsubscribeType, google.ExtensionUnsubscribe},
+		{adapterstest.ForwardType, google.ExtensionForward},
 		{adapterstest.TicketEffectType, zendesk.ExtensionUpdate},
 	} {
 		fe := adapterstest.New()
